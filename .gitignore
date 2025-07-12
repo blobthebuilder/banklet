@@ -1,0 +1,14 @@
+# Go
+/bin/
+/pkg/
+/*.exe
+/*.test
+*.out
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Env files
+.env
