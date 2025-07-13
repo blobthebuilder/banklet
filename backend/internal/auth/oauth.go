@@ -3,12 +3,19 @@ package auth
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+
+	"github.com/blobthebuilder/budgeteer/internal/db"
+	"github.com/blobthebuilder/budgeteer/internal/models"
 )
 
 type AuthResponse struct {
@@ -64,12 +71,30 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	userInfo := struct {
 		Email string `json:"email"`
+		GoogleID string `json:"id"`
 	}{}
 	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
 		http.Error(w, "Failed to decode user info: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
+	ctx := context.Background()
+
+	user, err := getUserByGoogleID(ctx, db.DB, userInfo.GoogleID)
+	if err != nil {
+		http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if user == nil {
+		newUser, err := createUser(ctx, db.DB, userInfo.GoogleID, userInfo.Email)
+		if err != nil {
+			http.Error(w, "Failed to create user: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		user = newUser
+	}
+
 	jwtToken, err := CreateJWT(userInfo.Email)
 	if err != nil {
 		http.Error(w, "Failed to create token", http.StatusInternalServerError)
@@ -77,8 +102,36 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(AuthResponse{
-		Email: userInfo.Email,
+	json.NewEncoder(w).Encode(struct {
+		User  *models.User `json:"user"`
+		Token string       `json:"token"`
+	}{
+		User:  user,
 		Token: jwtToken,
 	})
+}
+
+func getUserByGoogleID(ctx context.Context, db *pgxpool.Pool, googleID string) (*models.User, error) {
+    user := &models.User{}
+    err := db.QueryRow(ctx, "SELECT id, google_id, email, created_at FROM users WHERE google_id=$1", googleID).
+        Scan(&user.ID, &user.GoogleID, &user.Email, &user.CreatedAt)
+    if err != nil {
+        if errors.Is(err, pgx.ErrNoRows) {
+            return nil, nil
+        }
+        return nil, err
+    }
+    return user, nil
+}
+
+func createUser(ctx context.Context, db *pgxpool.Pool, googleID, email string) (*models.User, error) {
+    user := &models.User{}
+    err := db.QueryRow(ctx,
+        `INSERT INTO users (google_id, email, created_at) VALUES ($1, $2, $3) RETURNING id, google_id, email, created_at`,
+        googleID, email, time.Now(),
+    ).Scan(&user.ID, &user.GoogleID, &user.Email, &user.CreatedAt)
+    if err != nil {
+        return nil, err
+    }
+    return user, nil
 }

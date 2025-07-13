@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/blobthebuilder/budgeteer/internal/auth"
+	"github.com/blobthebuilder/budgeteer/internal/db"
 	"github.com/joho/godotenv"
 )
 
@@ -20,6 +21,7 @@ func main() {
   	}
 	auth.InitAuth()
 	auth.InitGoogleOAuth()
+	db.InitDatabase()
 
 	r := chi.NewRouter()
 
