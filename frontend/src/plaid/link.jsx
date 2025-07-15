@@ -43,12 +43,15 @@ const fetchLinkToken = async function () {
  * Exchange our Link token data for an access token
  */
 const exchangePublicToken = async (publicToken) => {
-  await fetch("/api/set_access_token", {
+  const formData = new URLSearchParams();
+  formData.append("public_token", publicToken);
+
+  const response = await fetch("/api/get_access_token", {
     method: "POST",
+    body: formData,
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: JSON.stringify({ publicToken }),
   });
   console.log("Done exchanging our token.");
 };

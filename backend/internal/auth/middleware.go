@@ -22,14 +22,14 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
-		email, userID, err := ValidateJWT(tokenStr)
+		email, googleID, err := ValidateJWT(tokenStr)
 		if err != nil {
 			http.Error(w, "Invalid token: "+err.Error(), http.StatusUnauthorized)
 			return
 		}
 
 		ctx := context.WithValue(r.Context(), UserEmailKey, email)
-		ctx = context.WithValue(ctx, GoogleIDKey, userID)
+		ctx = context.WithValue(ctx, GoogleIDKey, googleID)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

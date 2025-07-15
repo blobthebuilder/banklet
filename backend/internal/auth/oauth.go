@@ -98,6 +98,7 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jwtToken, err := CreateJWT(userInfo.Email, userInfo.GoogleID)
+	fmt.Println("JWT Token:", jwtToken)
 	if err != nil {
 		http.Error(w, "Failed to create token", http.StatusInternalServerError)
 		return
@@ -113,7 +114,7 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	*/
 
-	http.Redirect(w, r, "http://localhost:5173/dashboard?token="+jwtToken, http.StatusSeeOther)
+	http.Redirect(w, r, "http://localhost:5173/dashboard", http.StatusSeeOther)
 }
 
 func getUserByGoogleID(ctx context.Context, db *pgxpool.Pool, googleID string) (*models.User, error) {

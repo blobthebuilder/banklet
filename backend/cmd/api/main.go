@@ -47,9 +47,13 @@ func main() {
 	r.Get("/auth/google/callback", auth.CallbackHandler)
 
 	//plaid
-	r.Post("/api/create_link_token", plaid.CreateLinkToken)
-	r.Post("/api/set_access_token", plaid.GetAccessToken)
-	r.Get("/api/transactions", plaid.Transactions)
+	r.Group(func(protected chi.Router) {
+		protected.Use(auth.AuthMiddleware) // Apply middleware
+
+		protected.Post("/api/create_link_token", plaid.CreateLinkToken)
+		protected.Post("/api/get_access_token", plaid.GetAccessToken)
+		protected.Get("/api/transactions", plaid.Transactions)
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {

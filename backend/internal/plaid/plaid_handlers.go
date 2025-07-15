@@ -79,6 +79,7 @@ func renderError(w http.ResponseWriter, originalErr error) {
 func CreateLinkToken(w http.ResponseWriter, r *http.Request) {
 	linkToken, err := linkTokenCreate(nil)
 	if err != nil {
+		fmt.Println("Error creating link token:", err)
 		renderError(w, err)
 		return
 	}
@@ -99,7 +100,7 @@ func linkTokenCreate(
 	}
 
 	request := plaid.NewLinkTokenCreateRequest(
-		"Plaid Quickstart",
+		"Banklet",
 		"en",
 		countryCodes,
 		user,
@@ -144,18 +145,22 @@ func linkTokenCreate(
 }
 
 func GetAccessToken(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("GetAccessToken called")
+	
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, "Invalid form data", http.StatusBadRequest)
 		return
 	}
 	publicToken := r.FormValue("public_token")
+	fmt.Println("public token:", publicToken)
 	ctx := context.Background()
 
 	exchangePublicTokenResp, _, err := client.PlaidApi.ItemPublicTokenExchange(ctx).ItemPublicTokenExchangeRequest(
 		*plaid.NewItemPublicTokenExchangeRequest(publicToken),
 	).Execute()
 	if err != nil {
+		fmt.Println("Error exchanging public token:", err)
 		renderError(w, err)
 		return
 	}
@@ -165,6 +170,7 @@ func GetAccessToken(w http.ResponseWriter, r *http.Request) {
 
 	googleID, ok := r.Context().Value(auth.GoogleIDKey).(string)
 	if !ok || googleID == "" {
+		fmt.Println("Google ID not found in context")
 		http.Error(w, "Google ID not found in context", http.StatusUnauthorized)
 		return
 	}

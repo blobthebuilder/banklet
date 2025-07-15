@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -29,7 +30,8 @@ func CreateJWT(email string, googleID string) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-func ValidateJWT(tokenStr string) (string, string, error) {
+func ValidateJWT(tokenStr string) (email string, googleID string, err error) {
+	fmt.Println("Validating JWT token:", tokenStr)
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
@@ -37,6 +39,7 @@ func ValidateJWT(tokenStr string) (string, string, error) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		email, _ := claims["email"].(string)
 		googleID, _ := claims["google_id"].(string)
+		fmt.Println("JWT token validated successfully:", email, googleID)
 		return email, googleID, nil
 	}
 
