@@ -37,3 +37,26 @@ func InitDatabase() error {
 
     return nil
 }
+
+func AddItem(ctx context.Context, itemID, userID, accessToken string) error {
+	_, err := DB.Exec(ctx,
+		`INSERT INTO items (id, user_id, access_token)
+		 VALUES ($1, $2, $3)`,
+		itemID, userID, accessToken)
+	return err
+}
+
+func AddBankNameForItem(ctx context.Context, itemID, bankName string) error {
+	_, err := DB.Exec(ctx,
+		`UPDATE items SET bank_name = $1 WHERE id = $2`,
+		bankName, itemID)
+	return err
+}
+
+func AddAccount(ctx context.Context, accountID, itemID, name string) error {
+	_, err := DB.Exec(ctx,
+		`INSERT INTO accounts (id, item_id, name)
+		 VALUES ($1, $2, $3)`,
+		accountID, itemID, name)
+	return err
+}

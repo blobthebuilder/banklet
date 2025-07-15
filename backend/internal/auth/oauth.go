@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,8 +15,8 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 
-	"github.com/blobthebuilder/budgeteer/internal/db"
-	"github.com/blobthebuilder/budgeteer/internal/models"
+	"github.com/blobthebuilder/banklet/internal/db"
+	"github.com/blobthebuilder/banklet/internal/models"
 )
 
 type AuthResponse struct {
@@ -85,8 +86,9 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	
 	if user == nil {
+		fmt.Println("creating user")
 		newUser, err := createUser(ctx, db.DB, userInfo.GoogleID, userInfo.Email)
 		if err != nil {
 			http.Error(w, "Failed to create user: "+err.Error(), http.StatusInternalServerError)
@@ -95,12 +97,12 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 		user = newUser
 	}
 
-	jwtToken, err := CreateJWT(userInfo.Email)
+	jwtToken, err := CreateJWT(userInfo.Email, userInfo.GoogleID)
 	if err != nil {
 		http.Error(w, "Failed to create token", http.StatusInternalServerError)
 		return
 	}
-
+	/*
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(struct {
 		User  *models.User `json:"user"`
@@ -109,6 +111,9 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 		User:  user,
 		Token: jwtToken,
 	})
+	*/
+
+	http.Redirect(w, r, "http://localhost:5173/dashboard?token="+jwtToken, http.StatusSeeOther)
 }
 
 func getUserByGoogleID(ctx context.Context, db *pgxpool.Pool, googleID string) (*models.User, error) {
