@@ -47,6 +47,7 @@ func main() {
 	// oauth
 	r.Get("/auth/google/login", auth.LoginHandler)
 	r.Get("/auth/google/callback", auth.CallbackHandler)
+	r.Post("/auth/logout", auth.LogoutHandler)
 
 	r.Get("/api/auth/check", func(w http.ResponseWriter, r *http.Request) {
     	auth.AuthMiddleware(http.HandlerFunc(auth.AuthCheckHandler)).ServeHTTP(w, r)
@@ -56,18 +57,19 @@ func main() {
 	r.Group(func(protected chi.Router) {
 		protected.Use(auth.AuthMiddleware) // Apply middleware
 
-		// createing token
+		// creating token
 		protected.Post("/api/tokens/create_link_token", plaid.CreateLinkToken)
 		protected.Post("/api/tokens/get_access_token", plaid.GetAccessToken)
 
 		protected.Get("/api/banks/list", plaid.ListBanks)
+		protected.Delete("/api/banks/{bank_id}", plaid.DeleteBank)
 
 		protected.Get("/api/transactions", plaid.Transactions)
 	})
 
 	 c := cors.New(cors.Options{
         AllowedOrigins:   []string{"http://localhost:5173"},
-        AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+        AllowedMethods:   []string{"GET", "POST", "OPTIONS", "DELETE"},
         AllowedHeaders:   []string{"Authorization", "Content-Type"},
         AllowCredentials: true,
     })

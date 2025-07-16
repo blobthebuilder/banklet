@@ -42,3 +42,14 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
+
+func AuthCheckHandler(w http.ResponseWriter, r *http.Request) {
+  userID, ok := r.Context().Value(UserEmailKey).(string)
+  if !ok || userID == "" {
+    http.Error(w, "Unauthorized", http.StatusUnauthorized)
+    return
+  }
+
+  w.WriteHeader(http.StatusOK)
+  w.Write([]byte(`{"status":"ok"}`))
+}

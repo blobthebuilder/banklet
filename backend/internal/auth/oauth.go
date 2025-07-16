@@ -150,13 +150,19 @@ func createUser(ctx context.Context, db *pgxpool.Pool, googleID, email string) (
     return user, nil
 }
 
-func AuthCheckHandler(w http.ResponseWriter, r *http.Request) {
-  userID, ok := r.Context().Value(UserEmailKey).(string)
-  if !ok || userID == "" {
-    http.Error(w, "Unauthorized", http.StatusUnauthorized)
-    return
-  }
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	// Optional: clear session from store if using gorilla/sessions or similar
 
-  w.WriteHeader(http.StatusOK)
-  w.Write([]byte(`{"status":"ok"}`))
+	// Remove cookie by setting MaxAge < 0 and matching Path
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token", // make sure this matches the cookie name
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   false, // true if using HTTPS
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	w.WriteHeader(http.StatusOK)
 }
