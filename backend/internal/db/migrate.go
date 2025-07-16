@@ -13,7 +13,7 @@ func Migrate() error {
 
 	CREATE TABLE IF NOT EXISTS profiles (
 		id SERIAL PRIMARY KEY,
-		user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+		user_google_id INTEGER NOT NULL REFERENCES users(google_id) ON DELETE CASCADE,
 		name TEXT,
 		avatar_url TEXT,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -13,6 +13,7 @@ import (
 	"github.com/blobthebuilder/banklet/internal/db"
 	"github.com/blobthebuilder/banklet/internal/plaid"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 )
 
 
@@ -34,6 +35,7 @@ func main() {
 
 	r := chi.NewRouter()
 
+	
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
@@ -46,19 +48,36 @@ func main() {
 	r.Get("/auth/google/login", auth.LoginHandler)
 	r.Get("/auth/google/callback", auth.CallbackHandler)
 
+	r.Get("/api/auth/check", func(w http.ResponseWriter, r *http.Request) {
+    	auth.AuthMiddleware(http.HandlerFunc(auth.AuthCheckHandler)).ServeHTTP(w, r)
+	})
+
 	//plaid
 	r.Group(func(protected chi.Router) {
 		protected.Use(auth.AuthMiddleware) // Apply middleware
 
-		protected.Post("/api/create_link_token", plaid.CreateLinkToken)
-		protected.Post("/api/get_access_token", plaid.GetAccessToken)
+		// createing token
+		protected.Post("/api/tokens/create_link_token", plaid.CreateLinkToken)
+		protected.Post("/api/tokens/get_access_token", plaid.GetAccessToken)
+
+		protected.Get("/api/banks/list", plaid.ListBanks)
+
 		protected.Get("/api/transactions", plaid.Transactions)
 	})
+
+	 c := cors.New(cors.Options{
+        AllowedOrigins:   []string{"http://localhost:5173"},
+        AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+        AllowedHeaders:   []string{"Authorization", "Content-Type"},
+        AllowCredentials: true,
+    })
+
+	handler := c.Handler(r)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 	fmt.Println("Server running on http://localhost:" + port)
-	http.ListenAndServe(":"+port, r)
+	http.ListenAndServe(":"+port, handler)
 }

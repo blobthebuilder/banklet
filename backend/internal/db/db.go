@@ -38,11 +38,11 @@ func InitDatabase() error {
     return nil
 }
 
-func AddItem(ctx context.Context, itemID, userID, accessToken string) error {
+func AddItem(ctx context.Context, itemID, userGoogleID, accessToken string) error {
 	_, err := DB.Exec(ctx,
-		`INSERT INTO items (id, user_id, access_token)
+		`INSERT INTO items (id, user_google_id, access_token)
 		 VALUES ($1, $2, $3)`,
-		itemID, userID, accessToken)
+		itemID, userGoogleID, accessToken)
 	return err
 }
 
@@ -59,4 +59,30 @@ func AddAccount(ctx context.Context, accountID, itemID, name string) error {
 		 VALUES ($1, $2, $3)`,
 		accountID, itemID, name)
 	return err
+}
+
+type BankItem struct {
+	ID       string `json:"id"`
+	BankName string `json:"bank_name"`
+}
+
+func GetBankNamesForUser(ctx context.Context, db *pgxpool.Pool, userID string) ([]BankItem, error) {
+	query := `SELECT id, bank_name FROM items WHERE user_google_id = $1`
+
+	rows, err := db.Query(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []BankItem
+	for rows.Next() {
+		var item BankItem
+		if err := rows.Scan(&item.ID, &item.BankName); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }

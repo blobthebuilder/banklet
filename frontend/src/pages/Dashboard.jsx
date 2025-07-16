@@ -1,30 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { startLink } from "../plaid/link.jsx";
+import useAuthCheck from "../utils/useAuthCheck.jsx";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [banks, setBanks] = useState([]);
+
+  useAuthCheck();
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tokenFromURL = urlParams.get("token");
+    // Fetch connected banks
+    const fetchBanks = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/banks/list", {
+          credentials: "include", // This is key to send cookies!
+        });
 
-    if (tokenFromURL) {
-      localStorage.setItem("token", tokenFromURL);
-      window.history.replaceState({}, "", "/dashboard");
-    }
-
-    const token = tokenFromURL || localStorage.getItem("token");
-
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+        if (response.ok) {
+          const data = await response.json();
+          setBanks(data);
+        } else {
+          console.error("Failed to fetch banks");
+        }
+      } catch (err) {
+        console.error("Error fetching banks:", err);
+      }
+    };
+    fetchBanks();
   }, [navigate]);
 
   const handleConnectBank = async () => {
     await startLink(() => {
-      console.log("Bank connected!"); // You could redirect or refresh here
+      console.log("Bank connected!");
+      window.location.reload(); // Refresh to re-fetch banks
     });
   };
 
@@ -34,9 +43,20 @@ const Dashboard = () => {
 
       <button
         onClick={handleConnectBank}
-        style={{ marginLeft: "1rem" }}>
+        style={{ marginBottom: "1rem" }}>
         Connect a Bank
       </button>
+
+      <h2>Connected Banks</h2>
+      {banks.length === 0 ? (
+        <p>No banks connected yet.</p>
+      ) : (
+        <ul>
+          {banks.map((bank) => (
+            <li key={bank.id}>{bank.bank_name}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

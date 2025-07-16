@@ -39,7 +39,6 @@ func ValidateJWT(tokenStr string) (email string, googleID string, err error) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		email, _ := claims["email"].(string)
 		googleID, _ := claims["google_id"].(string)
-		fmt.Println("JWT token validated successfully:", email, googleID)
 		return email, googleID, nil
 	}
 

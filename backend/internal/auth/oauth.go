@@ -113,7 +113,15 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 		Token: jwtToken,
 	})
 	*/
-
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    jwtToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false, // Change to true if using HTTPS in production
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   60 * 60 * 24 * 7, // 7 days
+	})
 	http.Redirect(w, r, "http://localhost:5173/dashboard", http.StatusSeeOther)
 }
 
@@ -140,4 +148,15 @@ func createUser(ctx context.Context, db *pgxpool.Pool, googleID, email string) (
         return nil, err
     }
     return user, nil
+}
+
+func AuthCheckHandler(w http.ResponseWriter, r *http.Request) {
+  userID, ok := r.Context().Value(UserEmailKey).(string)
+  if !ok || userID == "" {
+    http.Error(w, "Unauthorized", http.StatusUnauthorized)
+    return
+  }
+
+  w.WriteHeader(http.StatusOK)
+  w.Write([]byte(`{"status":"ok"}`))
 }

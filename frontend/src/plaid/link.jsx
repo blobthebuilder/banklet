@@ -33,8 +33,9 @@ export const startLink = async function (customSuccessHandler) {
  * as our `linkTokenData` variable defined at the beginning of our file.
  */
 const fetchLinkToken = async function () {
-  const linkTokenData = await fetch("/api/create_link_token", {
+  const linkTokenData = await fetch("/api/tokens/create_link_token", {
     method: "POST",
+    credentials: "include",
   }).then((res) => res.json());
   return linkTokenData;
 };
@@ -46,8 +47,9 @@ const exchangePublicToken = async (publicToken) => {
   const formData = new URLSearchParams();
   formData.append("public_token", publicToken);
 
-  const response = await fetch("/api/get_access_token", {
+  const response = await fetch("/api/tokens/get_access_token", {
     method: "POST",
+    credentials: "include",
     body: formData,
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",

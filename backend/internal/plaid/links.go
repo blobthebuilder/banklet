@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"sort"
 	"strings"
 	"time"
@@ -17,49 +16,7 @@ import (
 	"github.com/blobthebuilder/banklet/internal/db"
 )
 
-var (
-	PLAID_CLIENT_ID     = ""
-	PLAID_SECRET        = ""
-	PLAID_ENV           = ""
-	PLAID_PRODUCTS      = ""
-	PLAID_COUNTRY_CODES = ""
-	PLAID_REDIRECT_URI  = ""
-	APP_PORT            = ""
-	client              *plaid.APIClient = nil
-)
 
-// In-memory tokens (replace with secure store in prod)
-var accessToken string
-var userToken string
-var itemID string
-
-var paymentID string
-
-func InitPlaidClient() {
-	PLAID_CLIENT_ID = os.Getenv("PLAID_CLIENT_ID")
-	PLAID_SECRET = os.Getenv("PLAID_SECRET")
-
-	if PLAID_CLIENT_ID == "" || PLAID_SECRET == "" {
-		log.Fatal("Error: PLAID_SECRET or PLAID_CLIENT_ID is not set. Did you copy .env.example to .env and fill it out?")
-	}
-
-	PLAID_ENV = os.Getenv("PLAID_ENV")
-	PLAID_PRODUCTS = os.Getenv("PLAID_PRODUCTS")
-	PLAID_COUNTRY_CODES = os.Getenv("PLAID_COUNTRY_CODES")
-	PLAID_REDIRECT_URI = os.Getenv("PLAID_REDIRECT_URI")
-	APP_PORT = os.Getenv("APP_PORT")
-
-	configuration := plaid.NewConfiguration()
-	configuration.AddDefaultHeader("PLAID-CLIENT-ID", PLAID_CLIENT_ID)
-	configuration.AddDefaultHeader("PLAID-SECRET", PLAID_SECRET)
-	configuration.UseEnvironment(environments[PLAID_ENV])
-	client = plaid.NewAPIClient(configuration)
-}
-
-var environments = map[string]plaid.Environment{
-	"sandbox":    plaid.Sandbox,
-	"production": plaid.Production,
-}
 
 func renderError(w http.ResponseWriter, originalErr error) {
 	log.Println("Error:", originalErr)  // Log the error to console
@@ -83,6 +40,7 @@ func CreateLinkToken(w http.ResponseWriter, r *http.Request) {
 		renderError(w, err)
 		return
 	}
+	fmt.Println("Link token created successfully:", linkToken)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"link_token": linkToken})
 }
@@ -164,8 +122,11 @@ func GetAccessToken(w http.ResponseWriter, r *http.Request) {
 		renderError(w, err)
 		return
 	}
+	fmt.Print("Exchange Public Token Response: ", exchangePublicTokenResp)
 
 	accessToken = exchangePublicTokenResp.GetAccessToken()
+	fmt.Println("access token: " + publicToken)
+
 	itemID = exchangePublicTokenResp.GetItemId()
 
 	googleID, ok := r.Context().Value(auth.GoogleIDKey).(string)
@@ -176,25 +137,26 @@ func GetAccessToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.AddItem(ctx, itemID, googleID, accessToken); err != nil {
+		fmt.Println("add item failed", err)
 		http.Error(w, "Failed to add item: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// 2. Populate bank name
 	if err := populateBankName(ctx, accessToken, itemID); err != nil {
+		fmt.Println("populate bank name failed", err)
 		http.Error(w, "Failed to get bank name: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// 3. Populate account names
 	if err := populateAccountNames(ctx, accessToken); err != nil {
+		fmt.Println("populate account name failed", err)
 		http.Error(w, "Failed to get account names: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("public token: " + publicToken)
 	fmt.Println("access token: " + accessToken)
-	fmt.Println("item ID: " + itemID)
-
+	
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"access_token": accessToken,
@@ -282,6 +244,7 @@ func Transactions(w http.ResponseWriter, r *http.Request) {
 }
 
 func populateBankName(ctx context.Context, accessToken, itemID string) error {
+	fmt.Println("populateBankName called with accessToken:", accessToken, " and itemID:", itemID)
 	itemResp, _, err := client.PlaidApi.ItemGet(ctx).ItemGetRequest(
 		*plaid.NewItemGetRequest(accessToken),
 	).Execute()
@@ -309,6 +272,7 @@ func populateBankName(ctx context.Context, accessToken, itemID string) error {
 
 	// Now save bankName in your DB
 	if err := db.AddBankNameForItem(ctx, itemID, bankName); err != nil {
+		fmt.Print("Failed to save bank name:", err)
 		return fmt.Errorf("failed to save bank name: %w", err)
 	}
 

@@ -15,13 +15,21 @@ const (
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tokenStr := ""
+
 		authHeader := r.Header.Get("Authorization")
-		if !strings.HasPrefix(authHeader, "Bearer ") {
-			http.Error(w, "Missing or invalid Authorization header", http.StatusUnauthorized)
-			return
+		if strings.HasPrefix(authHeader, "Bearer ") {
+			tokenStr = strings.TrimPrefix(authHeader, "Bearer ")
+		} else {
+			cookie, err := r.Cookie("token")
+			if err != nil {
+				http.Error(w, "Missing token", http.StatusUnauthorized)
+				return
+			}
+			tokenStr = cookie.Value
 		}
 
-		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+
 		email, googleID, err := ValidateJWT(tokenStr)
 		if err != nil {
 			http.Error(w, "Invalid token: "+err.Error(), http.StatusUnauthorized)
