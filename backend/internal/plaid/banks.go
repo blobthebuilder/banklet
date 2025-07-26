@@ -24,8 +24,13 @@ func ListBanks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(items)
+	// Ensure we return an empty array instead of null
+    if items == nil {
+        items = []db.BankItem{}
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(items)
 }
 
 func DeleteBank(w http.ResponseWriter, r *http.Request) {

@@ -122,7 +122,7 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   60 * 60 * 24 * 7, // 7 days
 	})
-	http.Redirect(w, r, "http://localhost:5173/dashboard", http.StatusSeeOther)
+	http.Redirect(w, r, "http://localhost:3000/dashboard", http.StatusSeeOther)
 }
 
 func getUserByGoogleID(ctx context.Context, db *pgxpool.Pool, googleID string) (*models.User, error) {
