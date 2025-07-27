@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sort"
 	"strings"
 	"time"
 
@@ -191,57 +190,6 @@ func containsProduct(products []plaid.Products, product plaid.Products) bool {
 		}
 	}
 	return false
-}
-
-func Transactions(w http.ResponseWriter, r *http.Request) {
-	ctx := context.Background()
-
-	var cursor *string
-
-	var added []plaid.Transaction
-	var modified []plaid.Transaction
-	var removed []plaid.RemovedTransaction
-	hasMore := true
-
-	for hasMore {
-		request := plaid.NewTransactionsSyncRequest(accessToken)
-		if cursor != nil {
-			request.SetCursor(*cursor)
-		}
-		resp, _, err := client.PlaidApi.TransactionsSync(ctx).TransactionsSyncRequest(*request).Execute()
-		if err != nil {
-			renderError(w, err)
-			return
-		}
-
-		nextCursor := resp.GetNextCursor()
-		cursor = &nextCursor
-
-		if *cursor == "" {
-			hasMore = false
-			continue
-		}
-
-		added = append(added, resp.GetAdded()...)
-		modified = append(modified, resp.GetModified()...)
-		removed = append(removed, resp.GetRemoved()...)
-		hasMore = resp.GetHasMore()
-	}
-
-	sort.Slice(added, func(i, j int) bool {
-		return added[i].GetDate() < added[j].GetDate()
-	})
-
-	
-	latestTransactions := added
-	if len(added) > 9 {
-		latestTransactions = added[len(added)-9:]
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"latest_transactions": latestTransactions,
-	})
 }
 
 func populateBankName(ctx context.Context, accessToken, itemID string) error {

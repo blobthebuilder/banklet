@@ -9,6 +9,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [banks, setBanks] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [balances, setBalances] = useState<AccountBalance[]>([]);
 
   useAuthCheck();
 
@@ -113,6 +114,20 @@ export default function Dashboard() {
     currencyCode: t.CurrencyCode,
     pendingTransactionID: t.PendingTransactionID,
   });
+
+  const getBalances = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/balance");
+      if (!res.ok) {
+        throw new Error(`API error: ${res.status}`);
+      }
+      const data = await res.json();
+      setBalances(data);
+    } catch (err) {
+      console.error("Failed to fetch balances:", err);
+    }
+  };
+
   return (
     <div style={{ padding: "2rem" }}>
       <h1>Dashboard</h1>
@@ -133,6 +148,11 @@ export default function Dashboard() {
         onClick={displayTransactions}
         style={{ marginLeft: "1rem" }}>
         display
+      </button>
+      <button
+        onClick={getBalances}
+        style={{ marginLeft: "1rem" }}>
+        balance
       </button>
 
       <h2>Connected Banks</h2>
@@ -172,6 +192,29 @@ export default function Dashboard() {
                 <td className="border px-2 py-1">{txn.name}</td>
                 <td className="border px-2 py-1">{txn.category}</td>
                 <td className="border px-2 py-1">${txn.amount.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="p-4">
+        <h2 className="text-xl font-bold mb-4">Account Balances</h2>
+        <table className="table-auto border-collapse border border-gray-300">
+          <thead>
+            <tr>
+              <th className="border px-4 py-2">Account</th>
+              <th className="border px-4 py-2">Current</th>
+              <th className="border px-4 py-2">Available</th>
+              <th className="border px-4 py-2">Currency</th>
+            </tr>
+          </thead>
+          <tbody>
+            {balances.map((bal) => (
+              <tr key={bal.AccountID}>
+                <td className="border px-4 py-2">{bal.Name}</td>
+                <td className="border px-4 py-2">{bal.Current}</td>
+                <td className="border px-4 py-2">{bal.Available}</td>
+                <td className="border px-4 py-2">{bal.Currency}</td>
               </tr>
             ))}
           </tbody>

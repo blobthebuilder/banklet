@@ -81,10 +81,10 @@ func syncTransactionsForItem(ctx context.Context, itemID string) (models.SyncSum
 			fmt.Printf("failed to add transaction %s: %v\n", txn.TransactionId, err)
 		}
 	}
-	/*
+	
 	// Step 4: Modify existing transactions
 	for _, txn := range allData.Modified {
-		stx := SimpleTransactionFromPlaid(txn, itemInfo.UserGoogleID)
+		stx := SimplifyTransactionFromPlaid(txn, itemInfo.UserGoogleID)
 		result, err := db.ModifyExistingTransaction(ctx, stx)
 		if err == nil {
 			summary.Modified += result.Changes
@@ -93,6 +93,7 @@ func syncTransactionsForItem(ctx context.Context, itemID string) (models.SyncSum
 		}
 	}
 
+	
 	// Step 5: Mark removed transactions
 	for _, txn := range allData.Removed {
 		result, err := db.MarkTransactionAsRemoved(ctx, txn.TransactionId)
@@ -108,7 +109,7 @@ func syncTransactionsForItem(ctx context.Context, itemID string) (models.SyncSum
 	if err != nil {
 		return summary, fmt.Errorf("failed to save cursor: %w", err)
 	}
-	*/
+	
 	fmt.Printf("Sync summary for item %s: %+v\n", itemID, summary)
 	return summary, nil
 }

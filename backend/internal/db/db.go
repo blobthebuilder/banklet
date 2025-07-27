@@ -2,7 +2,9 @@ package db
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -220,6 +222,82 @@ func AddNewTransaction(ctx context.Context, stxObj models.SimpleTransaction) (*E
 
 	return &ExecResult{Changes: res.RowsAffected()}, nil
 }
+
+func ModifyExistingTransaction(ctx context.Context, stx models.SimpleTransaction) (*ExecResult, error) {
+	query := `
+		UPDATE transactions
+		SET account_id = $1,
+		    category = $2,
+		    date = $3,
+		    authorized_date = $4,
+		    name = $5,
+		    amount = $6,
+		    currency_code = $7
+		WHERE id = $8
+	`
+
+	res, err := DB.Exec(ctx, query,
+		stx.AccountID,
+		stx.Category,
+		stx.Date,
+		stx.AuthorizedDate,
+		stx.Name,
+		stx.Amount,
+		stx.CurrencyCode,
+		stx.ID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("ModifyExistingTransaction failed: %w", err)
+	}
+
+	return &ExecResult{Changes: res.RowsAffected()}, nil
+}
+
+func generateRandomUUID() (string, error) {
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
+}
+
+func MarkTransactionAsRemoved(ctx context.Context, transactionID string) (*ExecResult, error) {
+	// Create a new unique ID by appending a "-REMOVED-" suffix plus a random string
+	randomUUID, err := generateRandomUUID()
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate UUID: %w", err)
+	}
+	updatedID := transactionID + "-REMOVED-" + randomUUID
+
+	query := `
+		UPDATE transactions 
+		SET id = $1, is_removed = 1 
+		WHERE id = $2
+	`
+
+	res, err := DB.Exec(ctx, query, updatedID, transactionID)
+	if err != nil {
+		return nil, fmt.Errorf("MarkTransactionAsRemoved failed: %w", err)
+	}
+
+	return &ExecResult{Changes: res.RowsAffected()}, nil
+}
+
+func SaveCursorForItem(ctx context.Context, transactionCursor string, itemID string) error {
+	query := `
+		UPDATE items 
+		SET transaction_cursor = $1 
+		WHERE id = $2
+	`
+
+	_, err := DB.Exec(ctx, query, transactionCursor, itemID)
+	if err != nil {
+		return fmt.Errorf("SaveCursorForItem failed: %w", err)
+	}
+
+	return nil
+}
+
 func GetTransactionsByUserGoogleID(ctx context.Context, userGoogleID string) ([]models.SimpleTransaction, error) {
     query := `
         SELECT id, user_google_id, account_id, category, date, authorized_date, name, amount, currency_code

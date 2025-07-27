@@ -4,8 +4,8 @@ import "github.com/plaid/plaid-go/v31/plaid"
 
 type SyncSummary struct {
 	Added    int64
-	Removed  int
-	Modified int
+	Removed  int64
+	Modified int64
 }
 
 type SyncData struct {

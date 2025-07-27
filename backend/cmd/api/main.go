@@ -66,6 +66,8 @@ func main() {
 
 		protected.Get("/api/transactions", plaid.SyncTransactions)
 		protected.Get("/api/transactions/list", plaid.GetTransactions)
+
+		protected.Get("/api/balance", plaid.GetBalancesHandler)
 	})
 
 	 c := cors.New(cors.Options{

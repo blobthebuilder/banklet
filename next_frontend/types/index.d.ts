@@ -16,3 +16,11 @@ type Transaction = {
   currencyCode: string;
   pendingTransactionID: string | null;
 };
+
+interface AccountBalance {
+  AccountID: string;
+  Name: string;
+  Current: number;
+  Available: number;
+  Currency: string;
+}
