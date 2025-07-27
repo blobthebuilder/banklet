@@ -1,4 +1,4 @@
-"use client";
+"use client"; // change
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,7 @@ import useAuthCheck from "@/hooks/useAuthCheck";
 export default function Dashboard() {
   const router = useRouter();
   const [banks, setBanks] = useState<any[]>([]);
-  const userId = "some-user-id";
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useAuthCheck();
 
@@ -64,19 +64,75 @@ export default function Dashboard() {
     }
   };
 
+  const syncTransactions = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/transactions`, {
+        method: "GET",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json(); // parse JSON body
+      console.log("Transactions:", data);
+    } catch (err) {
+      console.error("Error getting transactions:", err);
+    }
+  };
+
+  const displayTransactions = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/transactions/list`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const normalized = data.transactions.map(normalizeTransaction);
+      setTransactions(normalized);
+    } catch (err) {
+      console.error("Error getting transactions:", err);
+    }
+  };
+  const normalizeTransaction = (t: any) => ({
+    id: t.ID,
+    userGoogleID: t.UserGoogleID,
+    accountID: t.AccountID,
+    category: t.Category,
+    date: t.Date,
+    authorizedDate: t.AuthorizedDate,
+    name: t.Name,
+    amount: t.Amount,
+    currencyCode: t.CurrencyCode,
+    pendingTransactionID: t.PendingTransactionID,
+  });
   return (
     <div style={{ padding: "2rem" }}>
       <h1>Dashboard</h1>
 
-      <PlaidLink
-        user={userId}
-        variant="primary"
-      />
+      <PlaidLink variant="primary" />
 
       <button
         onClick={handleLogout}
         style={{ marginLeft: "1rem" }}>
         Logout
+      </button>
+      <button
+        onClick={syncTransactions}
+        style={{ marginLeft: "1rem" }}>
+        Sync
+      </button>
+      <button
+        onClick={displayTransactions}
+        style={{ marginLeft: "1rem" }}>
+        display
       </button>
 
       <h2>Connected Banks</h2>
@@ -98,6 +154,29 @@ export default function Dashboard() {
           ))}
         </ul>
       )}
+      <div>
+        <h2 className="text-xl font-bold mb-4">Transactions</h2>
+        <table className="table-auto border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border px-2 py-1">Date</th>
+              <th className="border px-2 py-1">Name</th>
+              <th className="border px-2 py-1">Category</th>
+              <th className="border px-2 py-1">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions.map((txn) => (
+              <tr key={txn.id}>
+                <td className="border px-2 py-1">{txn.date}</td>
+                <td className="border px-2 py-1">{txn.name}</td>
+                <td className="border px-2 py-1">{txn.category}</td>
+                <td className="border px-2 py-1">${txn.amount.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

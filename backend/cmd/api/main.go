@@ -64,7 +64,8 @@ func main() {
 		protected.Get("/api/banks/list", plaid.ListBanks)
 		protected.Delete("/api/banks/{bank_id}", plaid.DeleteBank)
 
-		protected.Get("/api/transactions", plaid.Transactions)
+		protected.Get("/api/transactions", plaid.SyncTransactions)
+		protected.Get("/api/transactions/list", plaid.GetTransactions)
 	})
 
 	 c := cors.New(cors.Options{

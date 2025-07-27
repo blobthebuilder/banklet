@@ -150,7 +150,7 @@ func GetAccessToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 3. Populate account names
-	if err := populateAccountNames(ctx, accessToken); err != nil {
+	if err := populateAccountNames(ctx, accessToken, googleID); err != nil {
 		fmt.Println("populate account name failed", err)
 		http.Error(w, "Failed to get account names: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -218,7 +218,7 @@ func Transactions(w http.ResponseWriter, r *http.Request) {
 		cursor = &nextCursor
 
 		if *cursor == "" {
-			time.Sleep(2 * time.Second)
+			hasMore = false
 			continue
 		}
 
@@ -232,6 +232,7 @@ func Transactions(w http.ResponseWriter, r *http.Request) {
 		return added[i].GetDate() < added[j].GetDate()
 	})
 
+	
 	latestTransactions := added
 	if len(added) > 9 {
 		latestTransactions = added[len(added)-9:]
@@ -280,7 +281,7 @@ func populateBankName(ctx context.Context, accessToken, itemID string) error {
 }
 
 
-func populateAccountNames(ctx context.Context, accessToken string) error {
+func populateAccountNames(ctx context.Context, accessToken string, googleID string) error {
 	accountsResp, _, err := client.PlaidApi.AccountsGet(ctx).AccountsGetRequest(
 		*plaid.NewAccountsGetRequest(accessToken),
 	).Execute()
@@ -291,7 +292,7 @@ func populateAccountNames(ctx context.Context, accessToken string) error {
 	itemID := accountsResp.GetItem().ItemId
 
 	for _, acct := range accountsResp.GetAccounts() {
-		err := db.AddAccount(ctx, acct.GetAccountId(), itemID, acct.GetName())
+		err := db.AddAccount(ctx, acct.GetAccountId(), googleID, itemID, acct.GetName())
 		if err != nil {
 			log.Printf("failed to save account %s: %v", acct.GetAccountId(), err)
 		}

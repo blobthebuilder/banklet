@@ -2,11 +2,13 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
 	"time"
 
+	"github.com/blobthebuilder/banklet/internal/models"
 	"github.com/jackc/pgx"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -55,11 +57,11 @@ func AddBankNameForItem(ctx context.Context, itemID, bankName string) error {
 	return err
 }
 
-func AddAccount(ctx context.Context, accountID, itemID, name string) error {
+func AddAccount(ctx context.Context, accountID, user_google_id, itemID, name string) error {
 	_, err := DB.Exec(ctx,
-		`INSERT INTO accounts (id, item_id, name)
-		 VALUES ($1, $2, $3)`,
-		accountID, itemID, name)
+		`INSERT INTO accounts (id, user_google_id, item_id, name)
+		 VALUES ($1, $2, $3, $4)`,
+		accountID, user_google_id, itemID, name)
 	return err
 }
 
@@ -91,8 +93,9 @@ func GetBankNamesForUser(ctx context.Context, db *pgxpool.Pool, userID string) (
 
 type Item struct {
 	UserGoogleID      string
+	ItemID			  string
 	AccessToken       string
-	TransactionCursor string
+	TransactionCursor sql.NullString
 }
 
 func GetAccessTokenForUserAndItem(ctx context.Context, itemID string, googleID string) (string, error) {
@@ -134,4 +137,121 @@ func RemoveItem(ctx context.Context, itemID string, googleID string) error {
 
 	fmt.Println("Item removed successfully")
 	return nil
+}
+
+func GetItemIDsForUser(ctx context.Context, googleID string) ([]Item, error){
+	query := `
+		SELECT id, user_google_id
+		FROM items
+		WHERE user_google_id = $1
+	`
+
+	rows, err := DB.Query(ctx, query, googleID)
+	if err != nil {
+		fmt.Println("Error querying items:", err)
+		return nil, fmt.Errorf("failed to query items: %w", err)
+	}
+	defer rows.Close()
+
+	var items []Item
+	for rows.Next() {
+		var item Item
+		if err := rows.Scan(&item.ItemID, &item.UserGoogleID); err != nil {
+			fmt.Println("Error scanning item row:", err)
+			return nil, fmt.Errorf("failed to scan item row: %w", err)
+		}
+		items = append(items, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Println("Row iteration error:", err)
+		return nil, fmt.Errorf("row iteration error: %w", err)
+	}
+
+	return items, nil
+}
+
+func GetItemInfo(ctx context.Context, itemID string) (*Item, error) {
+	query := `
+		SELECT id, user_google_id, access_token, transaction_cursor
+		FROM items
+		WHERE id = $1
+	`
+
+	var info Item
+	err := DB.QueryRow(ctx, query, itemID).Scan(
+		&info.ItemID,
+		&info.UserGoogleID,
+		&info.AccessToken,
+		&info.TransactionCursor,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get item info: %w", err)
+	}
+
+	return &info, nil
+}
+
+type ExecResult struct {
+	Changes int64
+}
+
+func AddNewTransaction(ctx context.Context, stxObj models.SimpleTransaction) (*ExecResult, error) {
+	query := `
+		INSERT INTO transactions
+		(id, user_google_id, account_id, category, date, authorized_date, name, amount, currency_code)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+	`
+
+	res, err := DB.Exec(ctx, query,
+		stxObj.ID,
+		stxObj.UserGoogleID,
+		stxObj.AccountID,
+		stxObj.Category,
+		stxObj.Date,
+		stxObj.AuthorizedDate,
+		stxObj.Name,
+		stxObj.Amount,
+		stxObj.CurrencyCode,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("AddNewTransaction failed: %w", err)
+	}
+
+	return &ExecResult{Changes: res.RowsAffected()}, nil
+}
+func GetTransactionsByUserGoogleID(ctx context.Context, userGoogleID string) ([]models.SimpleTransaction, error) {
+    query := `
+        SELECT id, user_google_id, account_id, category, date, authorized_date, name, amount, currency_code
+        FROM transactions
+        WHERE user_google_id = $1
+        ORDER BY date DESC
+    `
+
+    rows, err := DB.Query(ctx, query, userGoogleID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var txns []models.SimpleTransaction
+    for rows.Next() {
+        var t models.SimpleTransaction
+        err := rows.Scan(
+            &t.ID,
+            &t.UserGoogleID,
+            &t.AccountID,
+            &t.Category,
+            &t.Date,
+            &t.AuthorizedDate,
+            &t.Name,
+            &t.Amount,
+            &t.CurrencyCode,
+        )
+        if err != nil {
+            return nil, err
+        }
+        txns = append(txns, t)
+    }
+    return txns, nil
 }
