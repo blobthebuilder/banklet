@@ -11,8 +11,6 @@ export default function Dashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balances, setBalances] = useState<AccountBalance[]>([]);
 
-  useAuthCheck();
-
   useEffect(() => {
     const fetchBanks = async () => {
       try {

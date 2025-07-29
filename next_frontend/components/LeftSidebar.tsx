@@ -95,14 +95,13 @@ const LeftSidebar = () => {
 
   return (
     <>
-      {/* Sidebar */}
       <Sidebar
-        collapsible="icon"
+        collapsible="offcanvas"
         className="border-r border-border/50 bg-gradient-to-b from-card to-card/50">
-        <SidebarHeader className="p-4 group-data-[collapsible=icon]:p-2">
+        <SidebarHeader className="p-4 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:py-3">
           <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
-            <div className="p-2 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg group-data-[collapsible=icon]:p-1.5">
-              <BarChart3 className="w-5 h-5 text-primary group-data-[collapsible=icon]:w-4 group-data-[collapsible=icon]:h-4" />
+            <div className="p-2 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg group-data-[collapsible=icon]:p-2">
+              <BarChart3 className="w-5 h-5 text-primary group-data-[collapsible=icon]:w-5 group-data-[collapsible=icon]:h-5" />
             </div>
             <div className="group-data-[collapsible=icon]:hidden">
               <h2 className="text-lg bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
@@ -113,7 +112,7 @@ const LeftSidebar = () => {
           </div>
         </SidebarHeader>
 
-        <SidebarContent className="px-2">
+        <SidebarContent className="px-2 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0.5">
           {navigationItems.map((group) => (
             <SidebarGroup key={group.group}>
               <SidebarGroupLabel className="text-xs text-muted-foreground mb-2 group-data-[collapsible=icon]:sr-only">
@@ -126,7 +125,7 @@ const LeftSidebar = () => {
                       <SidebarMenuButton
                         isActive={currentPathName === item.page}
                         tooltip={item.label}
-                        className="w-full flex items-center gap-3 p-2 rounded-lg transition-all duration-200 group hover:scale-105">
+                        className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
                         <div
                           className={`p-1.5 rounded-md bg-gradient-to-r ${item.gradient} bg-opacity-10 group-hover:scale-110 transition-transform duration-200`}>
                           <item.icon className="w-4 h-4" />
@@ -151,7 +150,7 @@ const LeftSidebar = () => {
                   <SidebarMenuButton
                     isActive={currentPathName === "profile"}
                     tooltip="Profile"
-                    className="w-full flex items-center gap-3 p-2 rounded-lg transition-all duration-200 group hover:scale-105">
+                    className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
                     <div className="p-1.5 rounded-md bg-gradient-to-r from-gray-400 to-gray-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
                       <User className="w-4 h-4" />
                     </div>
@@ -164,7 +163,7 @@ const LeftSidebar = () => {
                   <SidebarMenuButton
                     isActive={currentPathName === "settings"}
                     tooltip="Settings"
-                    className="w-full flex items-center gap-3 p-2 rounded-lg transition-all duration-200 group hover:scale-105">
+                    className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
                     <div className="p-1.5 rounded-md bg-gradient-to-r from-gray-400 to-gray-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
                       <Settings className="w-4 h-4" />
                     </div>
@@ -176,7 +175,7 @@ const LeftSidebar = () => {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     tooltip="Sign Out"
-                    className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-red-50 hover:text-red-600 transition-all duration-200 group hover:scale-105">
+                    className="w-full flex items-center gap-3 p-2 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group hover:scale-105 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:justify-center">
                     <div className="p-1.5 rounded-md bg-gradient-to-r from-red-400 to-red-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
                       <LogOut className="w-4 h-4" />
                     </div>
