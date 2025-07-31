@@ -1,16 +1,9 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Wallet, CreditCard, PlusCircle, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import AccountCard from "@/components/AccountCard";
+import AccountSummary from "@/components/AccountSummary";
+import AccountsHeader from "@/components/AccountsHeader";
 
 interface AccountsPageProps {
   setCurrentPage: (page: string) => void;
@@ -82,132 +75,43 @@ export default function AccountsPage({ setCurrentPage }: AccountsPageProps) {
     }
   };
 
+  // Calculate summary values dynamically if needed
+  const totalAssets = accounts.reduce(
+    (sum, acc) => (acc.balance > 0 ? sum + acc.balance : sum),
+    0
+  );
+  const totalDebt = accounts.reduce(
+    (sum, acc) => (acc.balance < 0 ? sum + Math.abs(acc.balance) : sum),
+    0
+  );
+  const netWorth = totalAssets - totalDebt;
+
   return (
-    <div className="pt-20 lg:pt-24 p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg">
-            <Wallet className="w-6 h-6 text-purple-600" />
-          </div>
-          <div>
-            <h1 className="text-3xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              My Accounts
-            </h1>
-            <p className="text-muted-foreground">
-              Manage your connected bank accounts and cards
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowBalances(!showBalances)}
-            className="flex items-center gap-2">
-            {showBalances ? (
-              <EyeOff className="w-4 h-4" />
-            ) : (
-              <Eye className="w-4 h-4" />
-            )}
-            {showBalances ? "Hide" : "Show"} Balances
-          </Button>
-          <Button
-            onClick={() => setCurrentPage("add-bank")}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
-            <PlusCircle className="w-4 h-4 mr-2" />
-            Add Account
-          </Button>
-        </div>
-      </div>
+    <div className="pt-10 lg:pt-10 p-6 space-y-6">
+      <AccountsHeader
+        showBalances={showBalances}
+        toggleShowBalances={() => setShowBalances(!showBalances)}
+        onAddAccount={() => setCurrentPage("add-bank")}
+      />
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {accounts.map((account) => (
-          <Card
+          <AccountCard
             key={account.id}
-            className="border-border/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 hover:scale-105 group overflow-hidden relative">
-            <div
-              className={`absolute inset-0 bg-gradient-to-br ${account.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
-            <CardHeader className="relative z-10 pb-3">
-              <div className="flex items-center justify-between">
-                <div
-                  className={`p-2 rounded-lg bg-gradient-to-br ${account.gradient} bg-opacity-10`}>
-                  {account.type === "Credit Card" ? (
-                    <CreditCard className="w-5 h-5 text-purple-600" />
-                  ) : (
-                    <Wallet className="w-5 h-5 text-purple-600" />
-                  )}
-                </div>
-                <Badge className={getStatusColor(account.status)}>
-                  {account.status}
-                </Badge>
-              </div>
-              <CardTitle className="group-hover:text-primary transition-colors duration-300">
-                {account.name}
-              </CardTitle>
-              <CardDescription>
-                {account.bank} • {account.type}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <div
-                className={`text-2xl mb-2 ${
-                  account.balance < 0 ? "text-red-600" : "text-emerald-600"
-                }`}>
-                {formatBalance(account.balance)}
-              </div>
-              <p className="text-xs text-muted-foreground mb-4">
-                Last updated {account.lastUpdate}
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 hover:bg-primary/5">
-                  View Details
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="px-3 hover:bg-primary/5">
-                  ⚙️
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            account={account}
+            showBalances={showBalances}
+            formatBalance={formatBalance}
+            getStatusColor={getStatusColor}
+          />
         ))}
       </div>
 
-      {/* Account Summary */}
-      <Card className="border-border/50 bg-gradient-to-r from-primary/5 via-purple-500/5 to-cyan-500/5">
-        <CardHeader>
-          <CardTitle>Account Summary</CardTitle>
-          <CardDescription>
-            Overview of all your connected accounts
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-background/50 rounded-lg">
-              <div className="text-2xl text-emerald-600 mb-1">
-                {showBalances ? "$25,506.72" : "••••••"}
-              </div>
-              <div className="text-sm text-muted-foreground">Total Assets</div>
-            </div>
-            <div className="text-center p-4 bg-background/50 rounded-lg">
-              <div className="text-2xl text-red-600 mb-1">
-                {showBalances ? "$1,234.56" : "••••••"}
-              </div>
-              <div className="text-sm text-muted-foreground">Total Debt</div>
-            </div>
-            <div className="text-center p-4 bg-background/50 rounded-lg">
-              <div className="text-2xl text-primary mb-1">
-                {showBalances ? "$24,272.16" : "••••••"}
-              </div>
-              <div className="text-sm text-muted-foreground">Net Worth</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <AccountSummary
+        showBalances={showBalances}
+        totalAssets={totalAssets}
+        totalDebt={totalDebt}
+        netWorth={netWorth}
+      />
     </div>
   );
 }

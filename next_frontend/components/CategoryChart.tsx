@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import {
   Card,
   CardContent,
@@ -16,6 +9,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { PieChart as PieChartIcon } from "lucide-react";
+import { renderCustomizedLabel } from "@/lib/PieChartUtils";
 
 const mockCategoryData = [
   { name: "Food & Dining", value: 1200, color: "#8b5cf6" },
@@ -28,33 +22,6 @@ const mockCategoryData = [
 
 export function CategoryChart() {
   const total = mockCategoryData.reduce((sum, item) => sum + item.value, 0);
-
-  const renderCustomizedLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-  }: any) => {
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor={x > cx ? "start" : "end"}
-        dominantBaseline="central"
-        fontSize="12"
-        fontWeight="600">
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
 
   return (
     <Card className="border-border/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 group overflow-hidden relative">
@@ -78,6 +45,7 @@ export function CategoryChart() {
           height={350}>
           <PieChart>
             <Pie
+              className="outline-none"
               data={mockCategoryData}
               cx="50%"
               cy="50%"

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from "next-themes";
 import {
   Card,
   CardContent,
@@ -36,6 +37,8 @@ import {
 import { useState } from "react";
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme();
+
   const [settings, setSettings] = useState({
     theme: "light",
     language: "en",
@@ -277,13 +280,14 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <h4 className="font-medium">Theme</h4>
                 <div className="grid grid-cols-3 gap-3">
+                  {/* Light */}
                   <div
                     className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                      settings.theme === "light"
+                      theme === "light"
                         ? "border-primary bg-primary/5"
                         : "border-border hover:border-primary/50"
                     }`}
-                    onClick={() => updateSetting("theme", "light")}>
+                    onClick={() => setTheme("light")}>
                     <div className="flex items-center gap-2 mb-2">
                       <Sun className="w-4 h-4" />
                       <span className="font-medium">Light</span>
@@ -291,13 +295,14 @@ export default function SettingsPage() {
                     <div className="w-full h-8 bg-gradient-to-r from-gray-100 to-gray-200 rounded"></div>
                   </div>
 
+                  {/* Dark */}
                   <div
                     className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                      settings.theme === "dark"
+                      theme === "dark"
                         ? "border-primary bg-primary/5"
                         : "border-border hover:border-primary/50"
                     }`}
-                    onClick={() => updateSetting("theme", "dark")}>
+                    onClick={() => setTheme("dark")}>
                     <div className="flex items-center gap-2 mb-2">
                       <Moon className="w-4 h-4" />
                       <span className="font-medium">Dark</span>
@@ -305,13 +310,14 @@ export default function SettingsPage() {
                     <div className="w-full h-8 bg-gradient-to-r from-gray-700 to-gray-900 rounded"></div>
                   </div>
 
+                  {/* System */}
                   <div
                     className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                      settings.theme === "auto"
+                      theme === "system"
                         ? "border-primary bg-primary/5"
                         : "border-border hover:border-primary/50"
                     }`}
-                    onClick={() => updateSetting("theme", "auto")}>
+                    onClick={() => setTheme("system")}>
                     <div className="flex items-center gap-2 mb-2">
                       <Smartphone className="w-4 h-4" />
                       <span className="font-medium">Auto</span>
@@ -321,6 +327,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
+              {/* Compact view remains local */}
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-medium">Compact View</h4>

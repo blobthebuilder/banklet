@@ -12,7 +12,6 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarFooter,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
   BarChart3,
@@ -22,13 +21,13 @@ import {
   Settings,
   LogOut,
   User,
-  Bell,
   TrendingUp,
   Wallet,
   PieChart,
 } from "lucide-react";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 const LeftSidebar = () => {
   const currentPathName = usePathname();
@@ -122,18 +121,22 @@ const LeftSidebar = () => {
                 <SidebarMenu>
                   {group.items.map((item) => (
                     <SidebarMenuItem key={item.page}>
-                      <SidebarMenuButton
-                        isActive={currentPathName === item.page}
-                        tooltip={item.label}
-                        className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
-                        <div
-                          className={`p-1.5 rounded-md bg-gradient-to-r ${item.gradient} bg-opacity-10 group-hover:scale-110 transition-transform duration-200`}>
-                          <item.icon className="w-4 h-4" />
-                        </div>
-                        <span className="text-sm group-data-[collapsible=icon]:sr-only">
-                          {item.label}
-                        </span>
-                      </SidebarMenuButton>
+                      <Link
+                        href={`/${item.page}`}
+                        prefetch>
+                        <SidebarMenuButton
+                          isActive={currentPathName === `/${item.page}`}
+                          tooltip={item.label}
+                          className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
+                          <div
+                            className={`p-1.5 rounded-md bg-gradient-to-r ${item.gradient} bg-opacity-10 group-hover:scale-110 transition-transform duration-200`}>
+                            <item.icon className="w-4 h-4" />
+                          </div>
+                          <span className="text-sm group-data-[collapsible=icon]:sr-only">
+                            {item.label}
+                          </span>
+                        </SidebarMenuButton>
+                      </Link>
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
@@ -147,30 +150,38 @@ const LeftSidebar = () => {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={currentPathName === "profile"}
-                    tooltip="Profile"
-                    className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
-                    <div className="p-1.5 rounded-md bg-gradient-to-r from-gray-400 to-gray-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
-                      <User className="w-4 h-4" />
-                    </div>
-                    <span className="text-sm group-data-[collapsible=icon]:sr-only">
-                      Profile
-                    </span>
-                  </SidebarMenuButton>
+                  <Link
+                    href="/profile"
+                    prefetch>
+                    <SidebarMenuButton
+                      isActive={currentPathName === "/profile"}
+                      tooltip="Profile"
+                      className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
+                      <div className="p-1.5 rounded-md bg-gradient-to-r from-gray-400 to-gray-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <span className="text-sm group-data-[collapsible=icon]:sr-only">
+                        Profile
+                      </span>
+                    </SidebarMenuButton>
+                  </Link>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={currentPathName === "settings"}
-                    tooltip="Settings"
-                    className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
-                    <div className="p-1.5 rounded-md bg-gradient-to-r from-gray-400 to-gray-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
-                      <Settings className="w-4 h-4" />
-                    </div>
-                    <span className="text-sm group-data-[collapsible=icon]:sr-only">
-                      Settings
-                    </span>
-                  </SidebarMenuButton>
+                  <Link
+                    href="/settings"
+                    prefetch>
+                    <SidebarMenuButton
+                      isActive={currentPathName === "/settings"}
+                      tooltip="Settings"
+                      className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
+                      <div className="p-1.5 rounded-md bg-gradient-to-r from-gray-400 to-gray-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
+                        <Settings className="w-4 h-4" />
+                      </div>
+                      <span className="text-sm group-data-[collapsible=icon]:sr-only">
+                        Settings
+                      </span>
+                    </SidebarMenuButton>
+                  </Link>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton

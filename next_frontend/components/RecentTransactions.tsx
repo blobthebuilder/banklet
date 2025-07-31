@@ -24,7 +24,7 @@ const mockTransactions = [
     description: "Grocery Store",
     category: "Food & Dining",
     amount: -87.32,
-    status: "completed",
+    status: "Completed",
   },
   {
     id: 2,
@@ -32,7 +32,7 @@ const mockTransactions = [
     description: "Salary Deposit",
     category: "Income",
     amount: 3200.0,
-    status: "completed",
+    status: "Completed",
   },
   {
     id: 3,
@@ -40,7 +40,7 @@ const mockTransactions = [
     description: "Gas Station",
     category: "Transportation",
     amount: -45.67,
-    status: "completed",
+    status: "Completed",
   },
   {
     id: 4,
@@ -48,7 +48,7 @@ const mockTransactions = [
     description: "Netflix Subscription",
     category: "Entertainment",
     amount: -15.99,
-    status: "completed",
+    status: "Completed",
   },
   {
     id: 5,
@@ -56,7 +56,7 @@ const mockTransactions = [
     description: "Coffee Shop",
     category: "Food & Dining",
     amount: -4.25,
-    status: "pending",
+    status: "Pending",
   },
 ];
 
@@ -89,7 +89,7 @@ export function RecentTransactions() {
                 <TableCell>
                   <Badge
                     variant={
-                      transaction.status === "completed"
+                      transaction.status === "Completed"
                         ? "default"
                         : "secondary"
                     }>

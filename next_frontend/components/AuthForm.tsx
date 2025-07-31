@@ -64,7 +64,8 @@ const AuthForm = ({ type }: { type: string }) => {
       <header className="flex flex-col gap-5 md:gap-8">
         <Link
           href="/"
-          className="cursor-pointer items-center gap-1 flex">
+          className="cursor-pointer items-center gap-1 flex"
+          prefetch>
           <Image
             src="/icons/logo.svg"
             width={34}
@@ -200,6 +201,7 @@ const AuthForm = ({ type }: { type: string }) => {
             </p>
             <Link
               href={type === "sign-in" ? "/sign-up" : "/sign-in"}
+              prefetch
               className="form-link">
               {type === "sign-in" ? "Sign up" : "Sign in"}
             </Link>

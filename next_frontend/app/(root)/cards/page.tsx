@@ -31,8 +31,6 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
-  LineChart,
-  Line,
 } from "recharts";
 
 export default function CardsPage() {
