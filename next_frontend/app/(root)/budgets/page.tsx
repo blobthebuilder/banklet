@@ -54,6 +54,10 @@ import {
   YAxis,
   CartesianGrid,
 } from "recharts";
+import BudgetsTrends from "@/components/BudgetsTrends";
+import BudgetsOverview from "@/components/BudgetsOverview";
+import BudgetsCards from "@/components/BudgetsCards";
+import BudgetsHeader from "@/components/BudgetsHeader";
 
 export default function BudgetsPage() {
   const [budgets, setBudgets] = useState([
@@ -64,7 +68,6 @@ export default function BudgetsPage() {
       spent: 645,
       icon: Utensils,
       color: "#8b5cf6",
-      gradient: "from-purple-500 to-pink-600",
     },
     {
       id: 2,
@@ -73,7 +76,6 @@ export default function BudgetsPage() {
       spent: 320,
       icon: Car,
       color: "#06b6d4",
-      gradient: "from-blue-500 to-cyan-600",
     },
     {
       id: 3,
@@ -82,7 +84,6 @@ export default function BudgetsPage() {
       spent: 285,
       icon: ShoppingCart,
       color: "#10b981",
-      gradient: "from-emerald-500 to-teal-600",
     },
     {
       id: 4,
@@ -91,7 +92,6 @@ export default function BudgetsPage() {
       spent: 165,
       icon: Gamepad2,
       color: "#f59e0b",
-      gradient: "from-amber-500 to-orange-600",
     },
     {
       id: 5,
@@ -100,7 +100,6 @@ export default function BudgetsPage() {
       spent: 580,
       icon: Home,
       color: "#ef4444",
-      gradient: "from-red-500 to-pink-600",
     },
   ]);
 
@@ -140,7 +139,6 @@ export default function BudgetsPage() {
         spent: 0,
         icon: ShoppingCart,
         color: "#8b5cf6",
-        gradient: "from-purple-500 to-pink-600",
       };
       setBudgets([...budgets, budget]);
       setNewBudget({ category: "", budget: "" });
@@ -154,145 +152,18 @@ export default function BudgetsPage() {
   }));
 
   return (
-    <div className="pt-20 lg:pt-24 p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg">
-            <PieChart className="w-6 h-6 text-yellow-600" />
-          </div>
-          <div>
-            <h1 className="text-3xl bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
-              Budgets
-            </h1>
-            <p className="text-muted-foreground">
-              Create and manage your spending budgets
-            </p>
-          </div>
-        </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-orange-600 hover:to-yellow-600 transition-all duration-300">
-              <PlusCircle className="w-4 h-4 mr-2" />
-              Create Budget
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Budget</DialogTitle>
-              <DialogDescription>
-                Set up a spending budget for a category
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="category">Category</Label>
-                <Select
-                  onValueChange={(value) =>
-                    setNewBudget({ ...newBudget, category: value })
-                  }>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Groceries">Groceries</SelectItem>
-                    <SelectItem value="Gas">Gas</SelectItem>
-                    <SelectItem value="Coffee">Coffee</SelectItem>
-                    <SelectItem value="Subscriptions">Subscriptions</SelectItem>
-                    <SelectItem value="Health">Health & Fitness</SelectItem>
-                    <SelectItem value="Travel">Travel</SelectItem>
-                    <SelectItem value="Education">Education</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="budget">Monthly Budget</Label>
-                <Input
-                  id="budget"
-                  type="number"
-                  placeholder="500"
-                  value={newBudget.budget}
-                  onChange={(e) =>
-                    setNewBudget({ ...newBudget, budget: e.target.value })
-                  }
-                />
-              </div>
-              <Button
-                onClick={handleCreateBudget}
-                className="w-full">
-                Create Budget
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+    <div className="pt-10 lg:pt-10 p-6 space-y-6">
+      <BudgetsHeader
+        newBudget={newBudget}
+        setNewBudget={setNewBudget}
+        handleCreateBudget={handleCreateBudget}
+      />
 
-      {/* Budget Overview */}
-      <div className="grid md:grid-cols-4 gap-4">
-        <Card className="border-border/50">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Budget</p>
-                <p className="text-2xl text-primary">
-                  ${totalBudget.toLocaleString()}
-                </p>
-              </div>
-              <div className="p-3 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg">
-                <DollarSign className="w-5 h-5 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Spent</p>
-                <p className="text-2xl text-orange-600">
-                  ${totalSpent.toLocaleString()}
-                </p>
-              </div>
-              <div className="p-3 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-orange-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Remaining</p>
-                <p className="text-2xl text-emerald-600">
-                  ${remaining.toLocaleString()}
-                </p>
-              </div>
-              <div className="p-3 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-lg">
-                <TrendingDown className="w-5 h-5 text-emerald-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Budget Usage</p>
-                <p className="text-2xl text-blue-600">
-                  {Math.round((totalSpent / totalBudget) * 100)}%
-                </p>
-              </div>
-              <div className="p-3 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-lg">
-                <PieChart className="w-5 h-5 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <BudgetsCards
+        totalBudget={totalBudget}
+        totalSpent={totalSpent}
+        remaining={remaining}
+      />
 
       {/* Budget Categories */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -307,8 +178,7 @@ export default function BudgetsPage() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div
-                      className={`p-2 rounded-lg bg-gradient-to-r ${budget.gradient} bg-opacity-10`}>
+                    <div className="p-2 rounded-lg bg-opacity-10">
                       <budget.icon
                         className="w-5 h-5"
                         style={{ color: budget.color }}
@@ -390,8 +260,6 @@ export default function BudgetsPage() {
           );
         })}
       </div>
-
-      {/* Budget Analysis */}
       <Tabs
         defaultValue="overview"
         className="space-y-4">
@@ -401,111 +269,14 @@ export default function BudgetsPage() {
         </TabsList>
 
         <TabsContent value="overview">
-          <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle>Budget Distribution</CardTitle>
-              <CardDescription>
-                How your spending is distributed across categories
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="h-80">
-                  <ResponsiveContainer
-                    width="100%"
-                    height="100%">
-                    <RechartsPieChart>
-                      <RechartsPieChart
-                        data={pieChartData}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        dataKey="value">
-                        {pieChartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={entry.color}
-                          />
-                        ))}
-                      </RechartsPieChart>
-                    </RechartsPieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="space-y-3">
-                  {budgets.map((budget) => (
-                    <div
-                      key={budget.id}
-                      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-4 h-4 rounded-full"
-                          style={{ backgroundColor: budget.color }}></div>
-                        <span className="text-sm">{budget.category}</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm font-medium">
-                          ${budget.spent}
-                        </span>
-                        <span className="text-xs text-muted-foreground block">
-                          {Math.round((budget.spent / totalSpent) * 100)}%
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <BudgetsOverview
+            budgets={budgets}
+            totalSpent={totalSpent}
+          />
         </TabsContent>
 
         <TabsContent value="trends">
-          <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle>Budget vs Actual Spending</CardTitle>
-              <CardDescription>
-                Compare your budgeted amounts with actual spending
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer
-                  width="100%"
-                  height="100%">
-                  <BarChart data={monthlyData}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="#e2e8f0"
-                    />
-                    <XAxis
-                      dataKey="month"
-                      stroke="#64748b"
-                    />
-                    <YAxis stroke="#64748b" />
-                    <Bar
-                      dataKey="budgeted"
-                      fill="#8b5cf6"
-                      name="Budgeted"
-                    />
-                    <Bar
-                      dataKey="spent"
-                      fill="#06b6d4"
-                      name="Actual Spent"
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="flex justify-center gap-6 mt-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                  <span className="text-sm">Budgeted</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-cyan-500 rounded-full"></div>
-                  <span className="text-sm">Actual Spent</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <BudgetsTrends monthlyData={monthlyData} />
         </TabsContent>
       </Tabs>
     </div>

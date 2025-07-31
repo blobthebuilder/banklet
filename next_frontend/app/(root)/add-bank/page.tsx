@@ -18,43 +18,43 @@ export default function AddBankPage() {
   ];
 
   return (
-    <div className="pt-20 lg:pt-10 p-6 max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Link
-          href="/dashboard"
-          prefetch>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-2 hover:bg-primary/5">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Dashboard
-          </Button>
-        </Link>
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-lg">
-            <PlusCircle className="w-6 h-6 text-blue-600" />
-          </div>
-          <div>
-            <h1 className="text-3xl bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-              Add Bank Account
-            </h1>
-            <p className="text-muted-foreground">
-              Connect your bank account to track transactions automatically
-            </p>
+    <div className="min-h-screen bg-[#ceeefe]">
+      <div className="pt-20 lg:pt-10 p-6 max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <Link
+            href="/dashboard"
+            prefetch>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-2 hover:bg-primary/5">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Dashboard
+            </Button>
+          </Link>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <PlusCircle className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <h1 className="text-3xl text-blue-600">Add Bank Account</h1>
+              <p className="text-muted-foreground">
+                Connect your bank account to track transactions automatically
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <AddBankCard popularBanks={popularBanks} />
-        </div>
+        <div className="grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <AddBankCard popularBanks={popularBanks} />
+          </div>
 
-        <div className="space-y-6">
-          <SecurityInfoCard />
-          <QuickConnectCard popularBanks={popularBanks} />
+          <div className="space-y-6">
+            <SecurityInfoCard />
+            <QuickConnectCard popularBanks={popularBanks} />
+          </div>
         </div>
       </div>
     </div>

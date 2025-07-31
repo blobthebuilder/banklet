@@ -27,6 +27,7 @@ import {
 
 import { KeyMetricsCard } from "@/components/KeyMetricsCard";
 import { InsightsCard } from "@/components/InsightsCard";
+
 import AnalyticsCharts from "@/components/AnalyticsCharts";
 
 export default function AnalyticsPage() {
@@ -45,7 +46,7 @@ export default function AnalyticsPage() {
     { name: "Shopping", value: 600, color: "#10b981" },
     { name: "Entertainment", value: 400, color: "#f59e0b" },
     { name: "Bills & Utilities", value: 900, color: "#ef4444" },
-    { name: "Other", value: 300, color: "#6b7280" },
+    { name: "Other", value: 300, color: "#8b5cf6" },
   ];
 
   const weeklySpending = [
@@ -135,7 +136,7 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className="pt-10 lg:pt-10 p-6 space-y-6">
+    <div className="pt-10 lg:pt-10 p-6 space-y-6 bg-[#d6f1e3]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-lg">

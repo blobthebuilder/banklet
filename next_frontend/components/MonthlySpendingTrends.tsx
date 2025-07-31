@@ -6,6 +6,7 @@ import {
   XAxis,
   YAxis,
   Line,
+  Tooltip,
 } from "recharts";
 import {
   Card,
@@ -14,6 +15,10 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+
+interface MonthlyTrendsChartProps {
+  data: { month: string; income: number; spending: number; savings: number }[];
+}
 
 export function MonthlyTrendsChart({ data }: MonthlyTrendsChartProps) {
   return (
@@ -39,6 +44,13 @@ export function MonthlyTrendsChart({ data }: MonthlyTrendsChartProps) {
                 stroke="#64748b"
               />
               <YAxis stroke="#64748b" />
+              <Tooltip
+                cursor={{ strokeDasharray: "3 3" }}
+                formatter={(value: number, name: string) => [
+                  `$${value}`,
+                  name.charAt(0).toUpperCase() + name.slice(1),
+                ]}
+              />
               <Line
                 type="monotone"
                 dataKey="income"

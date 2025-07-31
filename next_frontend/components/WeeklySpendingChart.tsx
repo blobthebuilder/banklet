@@ -6,6 +6,7 @@ import {
   XAxis,
   YAxis,
   Bar,
+  Tooltip,
 } from "recharts";
 import {
   Card,
@@ -38,31 +39,16 @@ export function WeeklySpendingChart({ data }: WeeklySpendingChartProps) {
                 dataKey="day"
                 stroke="#64748b"
               />
+              <Tooltip
+                cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                formatter={(value: number) => [`$${value}`, "Amount"]}
+              />
               <YAxis stroke="#64748b" />
               <Bar
                 dataKey="amount"
-                fill="url(#colorGradient)"
+                fill="#10b981" // Solid green color
                 radius={[4, 4, 0, 0]}
               />
-              <defs>
-                <linearGradient
-                  id="colorGradient"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="#8b5cf6"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="#06b6d4"
-                    stopOpacity={0.2}
-                  />
-                </linearGradient>
-              </defs>
             </BarChart>
           </ResponsiveContainer>
         </div>

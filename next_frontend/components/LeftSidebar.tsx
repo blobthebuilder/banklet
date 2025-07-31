@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 
 import {
@@ -40,13 +39,13 @@ const LeftSidebar = () => {
           icon: BarChart3,
           label: "Dashboard",
           page: "dashboard",
-          gradient: "from-primary to-purple-600",
+          color: "bg-purple-600",
         },
         {
           icon: TrendingUp,
           label: "Analytics",
           page: "analytics",
-          gradient: "from-emerald-500 to-teal-600",
+          color: "bg-teal-600",
         },
       ],
     },
@@ -57,19 +56,19 @@ const LeftSidebar = () => {
           icon: PlusCircle,
           label: "Add Bank",
           page: "add-bank",
-          gradient: "from-blue-500 to-cyan-600",
+          color: "bg-cyan-600",
         },
         {
           icon: Wallet,
           label: "My Accounts",
           page: "accounts",
-          gradient: "from-purple-500 to-pink-600",
+          color: "bg-pink-600",
         },
         {
           icon: CreditCard,
           label: "Cards",
           page: "cards",
-          gradient: "from-orange-500 to-red-600",
+          color: "bg-red-600",
         },
       ],
     },
@@ -80,13 +79,13 @@ const LeftSidebar = () => {
           icon: Target,
           label: "Goals",
           page: "goals",
-          gradient: "from-green-500 to-emerald-600",
+          color: "bg-emerald-600",
         },
         {
           icon: PieChart,
           label: "Budgets",
           page: "budgets",
-          gradient: "from-yellow-500 to-orange-600",
+          color: "bg-orange-600",
         },
       ],
     },
@@ -99,11 +98,11 @@ const LeftSidebar = () => {
         className="border-r border-border/50 bg-gradient-to-b from-card to-card/50">
         <SidebarHeader className="p-4 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:py-3">
           <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
-            <div className="p-2 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg group-data-[collapsible=icon]:p-2">
+            <div className="p-2 bg-purple-600 rounded-lg group-data-[collapsible=icon]:p-2">
               <BarChart3 className="w-5 h-5 text-primary group-data-[collapsible=icon]:w-5 group-data-[collapsible=icon]:h-5" />
             </div>
             <div className="group-data-[collapsible=icon]:hidden">
-              <h2 className="text-lg bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+              <h2 className="text-lg bg-purple-800 bg-clip-text text-transparent">
                 FinanceTracker
               </h2>
               <p className="text-xs text-muted-foreground">Dashboard</p>
@@ -129,7 +128,7 @@ const LeftSidebar = () => {
                           tooltip={item.label}
                           className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
                           <div
-                            className={`p-1.5 rounded-md bg-gradient-to-r ${item.gradient} bg-opacity-10 group-hover:scale-110 transition-transform duration-200`}>
+                            className={`p-1.5 rounded-md  ${item.color} bg-opacity-10 group-hover:scale-110 transition-transform duration-200`}>
                             <item.icon className="w-4 h-4" />
                           </div>
                           <span className="text-sm group-data-[collapsible=icon]:sr-only">
@@ -157,7 +156,7 @@ const LeftSidebar = () => {
                       isActive={currentPathName === "/profile"}
                       tooltip="Profile"
                       className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
-                      <div className="p-1.5 rounded-md bg-gradient-to-r from-gray-400 to-gray-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
+                      <div className="p-1.5 rounded-md bg-gray-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
                         <User className="w-4 h-4" />
                       </div>
                       <span className="text-sm group-data-[collapsible=icon]:sr-only">
@@ -174,7 +173,7 @@ const LeftSidebar = () => {
                       isActive={currentPathName === "/settings"}
                       tooltip="Settings"
                       className="w-full flex items-center gap-3 p-2 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:justify-center rounded-lg transition-all duration-200 group hover:scale-105">
-                      <div className="p-1.5 rounded-md bg-gradient-to-r from-gray-400 to-gray-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
+                      <div className="p-1.5 rounded-md bg-gray-400 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
                         <Settings className="w-4 h-4" />
                       </div>
                       <span className="text-sm group-data-[collapsible=icon]:sr-only">
@@ -187,7 +186,7 @@ const LeftSidebar = () => {
                   <SidebarMenuButton
                     tooltip="Sign Out"
                     className="w-full flex items-center gap-3 p-2 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group hover:scale-105 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:justify-center">
-                    <div className="p-1.5 rounded-md bg-gradient-to-r from-red-400 to-red-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
+                    <div className="p-1.5 rounded-md bg-red-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">
                       <LogOut className="w-4 h-4" />
                     </div>
                     <span className="text-sm group-data-[collapsible=icon]:sr-only">

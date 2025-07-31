@@ -11,7 +11,7 @@ export default function QuickConnectCard({
   popularBanks,
 }: QuickConnectCardProps) {
   return (
-    <Card className="border-border/50 bg-gradient-to-r from-blue-50 to-cyan-50">
+    <Card className="border-border/50 bg-blue-50">
       <CardHeader>
         <CardTitle className="text-blue-600">Quick Connect</CardTitle>
         <CardDescription>Popular banks for instant connection</CardDescription>

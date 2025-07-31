@@ -139,7 +139,7 @@ export default function AddBankCard({ popularBanks }: AddBankCardProps) {
 
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-cyan-600 hover:to-blue-600 transition-all duration-300">
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300">
             <PlusCircle className="w-4 h-4 mr-2" />
             Connect Bank Account
           </Button>

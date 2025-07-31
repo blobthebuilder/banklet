@@ -6,13 +6,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-interface AccountSummaryProps {
-  showBalances: boolean;
-  totalAssets: number;
-  totalDebt: number;
-  netWorth: number;
-}
-
 export default function AccountSummary({
   showBalances,
   totalAssets,

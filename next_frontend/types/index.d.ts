@@ -121,3 +121,75 @@ interface AccountSummaryProps {
   totalDebt: number;
   netWorth: number;
 }
+
+interface GoalsHeaderProps {
+  newGoal: {
+    title: string;
+    description: string;
+    target: string;
+    targetDate: string;
+    category: string;
+  };
+  setNewGoal: (goal: GoalsHeaderProps["newGoal"]) => void;
+  handleCreateGoal: () => void;
+}
+
+interface GoalsOverviewCardProps {
+  title: string;
+  value: string | number;
+  icon: LucideIcon;
+  colorClass: string; // Tailwind color (e.g., text-emerald-600)
+}
+
+interface GoalsCardProps {
+  goal: any;
+  getProgress: (current: number, target: number) => number;
+  getTimeLeft: (targetDate: string) => string;
+  getMonthlyRequired: (
+    current: number,
+    target: number,
+    targetDate: string
+  ) => number;
+}
+
+interface BudgetsHeaderProps {
+  newBudget: { category: string; budget: string };
+  setNewBudget: (budget: { category: string; budget: string }) => void;
+  handleCreateBudget: () => void;
+}
+
+interface BudgetsCardsProps {
+  totalBudget: number;
+  totalSpent: number;
+  remaining: number;
+}
+
+interface BudgetsOverviewProps {
+  budgets: { id: number; category: string; spent: number; color: string }[];
+  totalSpent: number;
+}
+
+interface BudgetsTrendsProps {
+  monthlyData: { month: string; budgeted: number; spent: number }[];
+}
+
+interface Budget {
+  id: number;
+  category: string;
+  budget: number;
+  spent: number;
+  icon: any;
+  color: string;
+}
+
+interface BudgetCategoryCardProps {
+  budget: Budget;
+  getBudgetStatus: (
+    spent: number,
+    budget: number
+  ) => {
+    status: string;
+    color: string;
+    bg: string;
+  };
+}
