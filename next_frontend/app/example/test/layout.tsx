@@ -1,6 +1,6 @@
-import React from "react";
+import { redirect } from "next/navigation";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

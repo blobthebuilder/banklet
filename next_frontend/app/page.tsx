@@ -18,6 +18,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import HomeHeader from "@/components/HomeHeader";
+import Link from "next/link";
 
 const Home = () => {
   const features = [
@@ -70,6 +71,7 @@ const Home = () => {
       iconBg: "bg-gradient-to-br from-yellow-100 to-orange-100",
     },
   ];
+
   return (
     <>
       <HomeHeader />
@@ -100,12 +102,14 @@ const Home = () => {
                 <DollarSign className="mr-2 h-5 w-5" />
                 Get Started Free
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-primary/30 hover:border-primary hover:bg-primary/5 transition-all duration-300 px-8 py-3 text-lg">
-                Sign In
-              </Button>
+              <Link href="/sign-in">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-primary/30 hover:border-primary hover:bg-primary/5 transition-all duration-300 px-8 py-3 text-lg">
+                  Sign In
+                </Button>
+              </Link>
             </div>
           </div>
 

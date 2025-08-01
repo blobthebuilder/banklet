@@ -24,12 +24,14 @@ import {
   Wallet,
   PieChart,
 } from "lucide-react";
+import { useClerk } from "@clerk/nextjs";
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 const LeftSidebar = () => {
   const currentPathName = usePathname();
+  const { signOut } = useClerk();
 
   const navigationItems = [
     {
@@ -184,6 +186,7 @@ const LeftSidebar = () => {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
+                    onClick={() => signOut()}
                     tooltip="Sign Out"
                     className="w-full flex items-center gap-3 p-2 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group hover:scale-105 group-data-[collapsible=icon]:px-4 group-data-[collapsible=icon]:justify-center">
                     <div className="p-1.5 rounded-md bg-red-600 bg-opacity-10 group-hover:scale-110 transition-transform duration-200">

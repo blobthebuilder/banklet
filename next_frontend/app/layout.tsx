@@ -2,7 +2,14 @@ import type { Metadata } from "next";
 import { Inter, IBM_Plex_Serif } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
-import { Providers } from "./providers";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -23,17 +30,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning>
-      <body
-        className={`${inter.variable} ${ibmPlexSerif.variable} antialiased`}>
-        <Providers>{children}</Providers>
-        <Script
-          src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"
-          strategy="afterInteractive"
-        />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html
+        lang="en"
+        suppressHydrationWarning>
+        <body
+          className={`${inter.variable} ${ibmPlexSerif.variable} antialiased`}>
+          {children}
+          <Script
+            src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"
+            strategy="afterInteractive"
+          />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
