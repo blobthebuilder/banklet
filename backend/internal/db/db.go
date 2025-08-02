@@ -72,10 +72,10 @@ type BankItem struct {
 	BankName string `json:"bank_name"`
 }
 
-func GetBankNamesForUser(ctx context.Context, db *pgxpool.Pool, userID string) ([]BankItem, error) {
+func GetBankNamesForUser(ctx context.Context, userID string) ([]BankItem, error) {
 	query := `SELECT id, bank_name FROM items WHERE user_google_id = $1`
 
-	rows, err := db.Query(ctx, query, userID)
+	rows, err := DB.Query(ctx, query, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -332,4 +332,43 @@ func GetTransactionsByUserGoogleID(ctx context.Context, userGoogleID string) ([]
         txns = append(txns, t)
     }
     return txns, nil
+}
+
+func GetAccessTokensByGoogleID(ctx context.Context, userGoogleID string) ([]string, error) {
+    query := `
+        SELECT access_token
+        FROM items
+        WHERE user_google_id = $1
+    `
+
+    rows, err := DB.Query(ctx, query, userGoogleID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var tokens []string
+    for rows.Next() {
+        var token string
+        if err := rows.Scan(&token); err != nil {
+            return nil, err
+        }
+        tokens = append(tokens, token)
+    }
+
+    return tokens, nil
+}
+
+func GetItemIDForAccessToken(ctx context.Context, accessToken string) (string, error) {
+	query := `
+        SELECT id
+        FROM items
+        WHERE access_token = $1
+    `
+	var id string
+    err := DB.QueryRow(ctx, query, accessToken).Scan(&id)
+    if err != nil {
+        return "", err
+    }
+    return id, nil
 }

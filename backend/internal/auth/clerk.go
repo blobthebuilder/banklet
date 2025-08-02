@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,7 +11,7 @@ import (
 
 var clerkClient clerk.Client
 
-func init() {
+func InitClerk() {
 	var err error
 	clerkClient, err = clerk.NewClient(os.Getenv("CLERK_SECRET_KEY"))
 	if err != nil {
@@ -34,9 +35,12 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
+	
+		ctx := context.WithValue(r.Context(), GoogleIDKey, sessionClaims.Subject)
+		//ctx = context.WithValue(ctx, UserEmailKey, sessionClaims.)
 		// You now have sessionClaims.Subject (user ID) and other claims
-		fmt.Println("User ID:", sessionClaims.Subject)
+		fmt.Println("User ID authorized:", sessionClaims.Subject)
 
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

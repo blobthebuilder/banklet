@@ -29,6 +29,7 @@ func init (){
 	auth.InitGoogleOAuth()
 	db.InitDatabase()
 	plaid.InitPlaidClient()
+	auth.InitClerk()
 }
 
 func main() {
@@ -49,6 +50,7 @@ func main() {
 	r.Get("/auth/google/callback", auth.CallbackHandler)
 	r.Post("/auth/logout", auth.LogoutHandler)
 
+	r.Post("/api/sync-user", auth.SyncUserHandler)
 	r.Get("/api/auth/check", func(w http.ResponseWriter, r *http.Request) {
     	auth.AuthMiddleware(http.HandlerFunc(auth.AuthCheckHandler)).ServeHTTP(w, r)
 	})
@@ -68,6 +70,8 @@ func main() {
 		protected.Get("/api/transactions/list", plaid.GetTransactions)
 
 		protected.Get("/api/balance", plaid.GetBalancesHandler)
+
+		protected.Get("/api/accounts", plaid.GetAccountsHandler)
 	})
 
 	 c := cors.New(cors.Options{

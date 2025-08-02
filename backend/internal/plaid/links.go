@@ -33,6 +33,7 @@ func renderError(w http.ResponseWriter, originalErr error) {
 }
 
 func CreateLinkToken(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Creating link token")
 	linkToken, err := linkTokenCreate(nil)
 	if err != nil {
 		fmt.Println("Error creating link token:", err)
@@ -91,10 +92,18 @@ func linkTokenCreate(
 		request.SetRedirectUri(redirectURI)
 	}
 
-	linkTokenCreateResp, _, err := client.PlaidApi.LinkTokenCreate(ctx).LinkTokenCreateRequest(*request).Execute()
+	linkTokenCreateResp, httpResp, err := client.PlaidApi.LinkTokenCreate(ctx).LinkTokenCreateRequest(*request).Execute()
 
 	if err != nil {
-		// Log HTTP status code and body for more insight
+	
+		if apiErr, ok := err.(plaid.GenericOpenAPIError); ok {
+			fmt.Printf("Plaid error body: %s\n", string(apiErr.Body()))
+		}
+
+		if httpResp != nil {
+			fmt.Printf("Status Code: %d\n", httpResp.StatusCode)
+		}
+
 		return "", err
 	}
 

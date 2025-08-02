@@ -1,5 +1,7 @@
 "use client";
 
+import { useAuth } from "@clerk/nextjs";
+
 export const startLink = async function (customSuccessHandler: () => void) {
   const linkTokenData = await fetchLinkToken();
   if (!linkTokenData) return;
@@ -21,11 +23,17 @@ export const startLink = async function (customSuccessHandler: () => void) {
 
   handler.open();
 };
-
+const { getToken, isLoaded, isSignedIn } = useAuth();
 const fetchLinkToken = async function () {
+  if (!isLoaded || !isSignedIn) {
+    return;
+  }
+  const token = await getToken();
   const res = await fetch("/api/tokens/create_link_token", {
     method: "POST",
-    credentials: "include",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
   return res.json();
 };

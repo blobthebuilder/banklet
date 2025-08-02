@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/nextjs";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import z from "zod";

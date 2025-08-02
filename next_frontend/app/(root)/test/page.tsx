@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PlaidLink from "@/components/PlaidLink";
-import useAuthCheck from "@/hooks/useAuthCheck";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -11,11 +11,19 @@ export default function Dashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balances, setBalances] = useState<AccountBalance[]>([]);
 
+  const { getToken, isLoaded, isSignedIn } = useAuth();
+
   useEffect(() => {
     const fetchBanks = async () => {
+      if (!isLoaded || !isSignedIn) {
+        return;
+      }
+      const token = await getToken();
       try {
         const response = await fetch("http://localhost:8080/api/banks/list", {
-          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (response.ok) {
@@ -29,13 +37,16 @@ export default function Dashboard() {
       }
     };
     fetchBanks();
-  }, [router]);
+  }, [getToken, isLoaded, isSignedIn]);
 
   const handleLogout = async () => {
+    const token = await getToken();
     try {
       await fetch("http://localhost:8080/auth/logout", {
         method: "POST",
-        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       router.push("/sign-in");
     } catch (err) {
@@ -45,11 +56,14 @@ export default function Dashboard() {
 
   const handleRemoveBank = async (bankId: string) => {
     try {
+      const token = await getToken();
       const response = await fetch(
         `http://localhost:8080/api/banks/${bankId}`,
         {
           method: "DELETE",
-          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -65,9 +79,12 @@ export default function Dashboard() {
 
   const syncTransactions = async () => {
     try {
+      const token = await getToken();
       const response = await fetch(`http://localhost:8080/api/transactions`, {
         method: "GET",
-        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -82,11 +99,14 @@ export default function Dashboard() {
 
   const displayTransactions = async () => {
     try {
+      const token = await getToken();
       const response = await fetch(
         `http://localhost:8080/api/transactions/list`,
         {
           method: "GET",
-          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       if (!response.ok) {
@@ -115,11 +135,20 @@ export default function Dashboard() {
 
   const getBalances = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/balance");
+      const token = await getToken();
+      if (!token) {
+        throw new Error("User token not available");
+      }
+      const res = await fetch("http://localhost:8080/api/balance", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) {
         throw new Error(`API error: ${res.status}`);
       }
       const data = await res.json();
+
       setBalances(data);
     } catch (err) {
       console.error("Failed to fetch balances:", err);

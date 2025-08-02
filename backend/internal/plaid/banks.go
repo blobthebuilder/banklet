@@ -18,7 +18,7 @@ func ListBanks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, err := db.GetBankNamesForUser(r.Context(), db.DB, googleID)
+	items, err := db.GetBankNamesForUser(r.Context(), googleID)
 	if err != nil {
 		http.Error(w, "Failed to fetch bank names: "+err.Error(), http.StatusInternalServerError)
 		return

@@ -3,8 +3,28 @@ import { SpendingChart } from "@/components/SpendingChart";
 import { CategoryChart } from "@/components/CategoryChart";
 import { RecentTransactions } from "@/components/RecentTransactions";
 import { BarChart3 } from "lucide-react";
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const user = await currentUser();
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  // Send to backend to ensure user exists there
+  await fetch("http:/localhost:8080/api/sync-user", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${user.id}`, // or Clerk JWT
+    },
+    body: JSON.stringify({
+      email: user.emailAddresses[0].emailAddress,
+      googleID: user.id,
+    }),
+  });
+
   return (
     <div className="min-h-screen bg-[#f5f3ff]">
       {/* Light purplish background */}

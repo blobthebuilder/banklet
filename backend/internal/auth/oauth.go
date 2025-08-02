@@ -166,3 +166,31 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func SyncUserHandler(w http.ResponseWriter, r *http.Request) {
+    var input struct {
+        Email    string `json:"email"`
+        GoogleID string `json:"googleID"`
+    }
+    if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+        http.Error(w, "Invalid request", http.StatusBadRequest)
+        return
+    }
+
+    ctx := context.Background()
+    user, err := getUserByGoogleID(ctx, db.DB, input.GoogleID)
+    if err != nil {
+        http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    if user == nil {
+        _, err := createUser(ctx, db.DB, input.GoogleID, input.Email)
+        if err != nil {
+            http.Error(w, "Failed to create user: "+err.Error(), http.StatusInternalServerError)
+            return
+        }
+    }
+
+    w.WriteHeader(http.StatusOK)
+}

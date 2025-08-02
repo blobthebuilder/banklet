@@ -147,9 +147,20 @@ func fetchNewSyncData(
 			IncludePersonalFinanceCategory: plaid.PtrBool(true),
 		})
 
-		resp, _, err := client.PlaidApi.TransactionsSync(ctx).TransactionsSyncRequest(*req).Execute()
+		resp, httpResp, err := client.PlaidApi.TransactionsSync(ctx).TransactionsSyncRequest(*req).Execute()
 		if err != nil {
 			// Retry after a delay
+			fmt.Printf("Plaid API error: %v\n", err)
+
+			// If it's a Plaid API error, we can extract details
+			if apiErr, ok := err.(plaid.GenericOpenAPIError); ok {
+				fmt.Printf("Plaid error body: %s\n", string(apiErr.Body()))
+			}
+
+			if httpResp != nil {
+				fmt.Printf("Status Code: %d\n", httpResp.StatusCode)
+			}
+
 			fmt.Printf("Error during sync: %v. Retrying...\n", err)
 			time.Sleep(1 * time.Second)
 			return fetchNewSyncData(ctx, accessToken, initialCursor, retriesLeft-1)
