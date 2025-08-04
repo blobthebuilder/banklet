@@ -46,7 +46,7 @@ export default function AnalyticsPage() {
     { name: "Shopping", value: 600, color: "#10b981" },
     { name: "Entertainment", value: 400, color: "#f59e0b" },
     { name: "Bills & Utilities", value: 900, color: "#ef4444" },
-    { name: "Other", value: 300, color: "#8b5cf6" },
+    { name: "Other", value: 300, color: "#6b7280" },
   ];
 
   const weeklySpending = [

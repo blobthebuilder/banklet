@@ -1,10 +1,13 @@
 import { FinancialOverview } from "@/components/FinancialOverview";
 import { SpendingChart } from "@/components/SpendingChart";
-import { CategoryChart } from "@/components/CategoryChart";
-import { RecentTransactions } from "@/components/RecentTransactions";
+import CategoryChart from "@/components/CategoryChart";
+import RecentTransactions from "@/components/RecentTransactions";
 import { BarChart3 } from "lucide-react";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import DashboardHeader from "@/components/DashboardHeader";
+import { normalizeCategories } from "@/lib/utils";
+import { normalize } from "path";
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -25,29 +28,35 @@ export default async function DashboardPage() {
     }),
   });
 
+  const { getToken } = await auth();
+  const token = await getToken();
+
+  const res = await fetch("http://localhost:8080/api/transactions/category", {
+    headers: {
+      Authorization: `Bearer ${token}`, // server-side auth
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch category data: ${res.status}`);
+  }
+
+  const data = await res.json();
+  const transactionsArray = data.transactions || [];
+  const categorySpending = normalizeCategories(transactionsArray);
+
   return (
     <div className="min-h-screen bg-[#f5f3ff]">
       {/* Light purplish background */}
+      <DashboardHeader />
       <div className="container mx-auto p-6 space-y-8">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-purple-100 rounded-lg">
-            <BarChart3 className="w-6 h-6 text-purple-600" />
-          </div>
-          <div>
-            <h1 className="text-4xl text-purple-700">Financial Dashboard</h1>
-            <p className="text-muted-foreground">
-              Welcome back! Here's an overview of your financial health.
-            </p>
-          </div>
-        </div>
-
         {/* Financial Overview Cards */}
         <FinancialOverview />
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           <SpendingChart />
-          <CategoryChart />
+          <CategoryChart data={categorySpending} />
         </div>
 
         {/* Recent Transactions */}

@@ -1,5 +1,4 @@
 "use client";
-
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import {
   Card,
@@ -11,21 +10,20 @@ import {
 import { PieChart as PieChartIcon } from "lucide-react";
 import { renderCustomizedLabel } from "@/lib/PieChartUtils";
 
-const mockCategoryData = [
-  { name: "Food & Dining", value: 1200, color: "#8b5cf6" },
-  { name: "Transportation", value: 800, color: "#06b6d4" },
-  { name: "Shopping", value: 600, color: "#10b981" },
-  { name: "Entertainment", value: 400, color: "#f59e0b" },
-  { name: "Bills & Utilities", value: 900, color: "#ef4444" },
-  { name: "Other", value: 300, color: "#6b7280" },
-];
+// const mockCategoryData = [
+//   { name: "Food & Dining", value: 1200, color: "#8b5cf6" },
+//   { name: "Transportation", value: 800, color: "#06b6d4" },
+//   { name: "Shopping", value: 600, color: "#10b981" },
+//   { name: "Entertainment", value: 400, color: "#f59e0b" },
+//   { name: "Bills & Utilities", value: 900, color: "#ef4444" },
+//   { name: "Other", value: 300, color: "#6b7280" },
+// ];
 
-export function CategoryChart() {
-  const total = mockCategoryData.reduce((sum, item) => sum + item.value, 0);
+export default function CategoryChart({ data }: CategoryChartProps) {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
 
   return (
     <Card className="border-border/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 group overflow-hidden relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       <CardHeader className="relative z-10">
         <div className="flex items-center gap-2 mb-2">
           <div className="p-2 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-lg">
@@ -46,7 +44,7 @@ export function CategoryChart() {
           <PieChart>
             <Pie
               className="outline-none"
-              data={mockCategoryData}
+              data={data}
               cx="50%"
               cy="50%"
               labelLine={false}
@@ -54,7 +52,7 @@ export function CategoryChart() {
               outerRadius={120}
               fill="#8884d8"
               dataKey="value">
-              {mockCategoryData.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={entry.color}
@@ -73,7 +71,7 @@ export function CategoryChart() {
           </PieChart>
         </ResponsiveContainer>
         <div className="mt-4 grid grid-cols-2 gap-2">
-          {mockCategoryData.map((entry, index) => (
+          {data.map((entry, index) => (
             <div
               key={index}
               className="flex items-center gap-2">

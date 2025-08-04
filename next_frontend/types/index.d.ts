@@ -193,3 +193,7 @@ interface BudgetCategoryCardProps {
     bg: string;
   };
 }
+
+type CategoryChartProps = {
+  data: CategorySpending[];
+};

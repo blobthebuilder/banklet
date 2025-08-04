@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Card,
   CardContent,
@@ -17,50 +15,29 @@ import {
 } from "./ui/table";
 import { Badge } from "./ui/badge";
 
-const mockTransactions = [
-  {
-    id: 1,
-    date: "2025-01-25",
-    description: "Grocery Store",
-    category: "Food & Dining",
-    amount: -87.32,
-    status: "Completed",
-  },
-  {
-    id: 2,
-    date: "2025-01-24",
-    description: "Salary Deposit",
-    category: "Income",
-    amount: 3200.0,
-    status: "Completed",
-  },
-  {
-    id: 3,
-    date: "2025-01-23",
-    description: "Gas Station",
-    category: "Transportation",
-    amount: -45.67,
-    status: "Completed",
-  },
-  {
-    id: 4,
-    date: "2025-01-22",
-    description: "Netflix Subscription",
-    category: "Entertainment",
-    amount: -15.99,
-    status: "Completed",
-  },
-  {
-    id: 5,
-    date: "2025-01-21",
-    description: "Coffee Shop",
-    category: "Food & Dining",
-    amount: -4.25,
-    status: "Pending",
-  },
-];
+import { normalizeTransaction } from "@/lib/utils";
+import { auth } from "@clerk/nextjs/server";
 
-export function RecentTransactions() {
+export default async function RecentTransactions() {
+  const { getToken } = await auth();
+  const token = await getToken();
+
+  const res = await fetch(
+    "http://localhost:8080/api/transactions/list?limit=5",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`, // server-side auth
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch transactions: ${res.status}`);
+  }
+
+  const data = await res.json();
+  const transactions = data.transactions.map(normalizeTransaction);
+
   return (
     <Card>
       <CardHeader>
@@ -79,12 +56,12 @@ export function RecentTransactions() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mockTransactions.map((transaction) => (
+            {transactions.map((transaction: any) => (
               <TableRow key={transaction.id}>
                 <TableCell>
                   {new Date(transaction.date).toLocaleDateString()}
                 </TableCell>
-                <TableCell>{transaction.description}</TableCell>
+                <TableCell>{transaction.name}</TableCell>
                 <TableCell>{transaction.category}</TableCell>
                 <TableCell>
                   <Badge

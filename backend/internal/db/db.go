@@ -298,15 +298,16 @@ func SaveCursorForItem(ctx context.Context, transactionCursor string, itemID str
 	return nil
 }
 
-func GetTransactionsByUserGoogleID(ctx context.Context, userGoogleID string) ([]models.SimpleTransaction, error) {
+func GetTransactionsByUserGoogleID(ctx context.Context, userGoogleID string, limit int) ([]models.SimpleTransaction, error) {
     query := `
         SELECT id, user_google_id, account_id, category, date, authorized_date, name, amount, currency_code
         FROM transactions
         WHERE user_google_id = $1
         ORDER BY date DESC
+		LIMIT $2
     `
 
-    rows, err := DB.Query(ctx, query, userGoogleID)
+    rows, err := DB.Query(ctx, query, userGoogleID, limit)
     if err != nil {
         return nil, err
     }
@@ -332,6 +333,52 @@ func GetTransactionsByUserGoogleID(ctx context.Context, userGoogleID string) ([]
         txns = append(txns, t)
     }
     return txns, nil
+}
+
+func GetCategorySpendingByUserGoogleID(
+	ctx context.Context,
+	userGoogleID string,
+	startDate time.Time,
+	endDate time.Time,
+) ([]models.CategorySpending, error) {
+	// The new query to get the grouped spending data
+	query := `
+		SELECT
+			category as name,
+			SUM(amount) AS value
+		FROM
+			transactions
+		WHERE
+			user_google_id = $1
+		GROUP BY
+			category
+		ORDER BY
+			value DESC
+	`
+
+	rows, err := DB.Query(ctx, query, userGoogleID)
+	if err != nil {
+		return nil, fmt.Errorf("querying category spending failed: %w", err)
+	}
+	defer rows.Close()
+
+	var categorySpendings []models.CategorySpending
+	for rows.Next() {
+		var cs models.CategorySpending
+		// Scan the results into our new struct
+		err := rows.Scan(&cs.Category, &cs.TotalSpent)
+		if err != nil {
+			return nil, fmt.Errorf("scanning row failed: %w", err)
+		}
+		categorySpendings = append(categorySpendings, cs)
+	}
+
+	// Check for errors from iterating over rows
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("row iteration failed: %w", err)
+	}
+
+	return categorySpendings, nil
 }
 
 func GetAccessTokensByGoogleID(ctx context.Context, userGoogleID string) ([]string, error) {

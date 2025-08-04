@@ -131,6 +131,7 @@ export default function Dashboard() {
     amount: t.Amount,
     currencyCode: t.CurrencyCode,
     pendingTransactionID: t.PendingTransactionID,
+    status: t.AuthorizedDate ? "Completed" : "Pending",
   });
 
   const getBalances = async () => {

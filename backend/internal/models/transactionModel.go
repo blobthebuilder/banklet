@@ -27,3 +27,8 @@ type SimpleTransaction struct {
 	CurrencyCode         string
 	PendingTransactionID *string
 }
+
+type CategorySpending struct {
+	Category   string
+	TotalSpent float64
+}

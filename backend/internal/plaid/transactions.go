@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/blobthebuilder/banklet/internal/auth"
@@ -190,9 +191,73 @@ func GetTransactions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	txns, err := db.GetTransactionsByUserGoogleID(ctx, googleID)
+	limitStr := r.URL.Query().Get("limit")
+    if limitStr == "" {
+        limitStr = "10" // Default to 10 if not provided
+    }
+
+	limit, err := strconv.Atoi(limitStr)
+    if err != nil || limit <= 0 {
+        http.Error(w, "Invalid limit parameter", http.StatusBadRequest)
+        return
+    }
+
+	txns, err := db.GetTransactionsByUserGoogleID(ctx, googleID, limit)
 	if err != nil{
 		fmt.Printf("error getting transactions by google id %s ", googleID)
+	}
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]interface{}{
+        "transactions": txns,
+    })
+}
+
+func getStartAndEndOfMonth(t time.Time) (time.Time, time.Time) {
+	// Start of the month is the first day at midnight
+	startOfMonth := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, t.Location())
+	// End of the month is the last day at one second before midnight
+	endOfMonth := startOfMonth.AddDate(0, 1, 0).Add(-time.Second)
+	return startOfMonth, endOfMonth
+}
+
+
+func GetCategorySpending(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	googleID, ok := r.Context().Value(auth.GoogleIDKey).(string)
+	if !ok || googleID == "" {
+		http.Error(w, "Unauthorized - Google ID missing", http.StatusUnauthorized)
+		return
+	}
+
+	queryParams := r.URL.Query()
+	startDateStr := queryParams.Get("startDate")
+	endDateStr := queryParams.Get("endDate")
+
+	var startDate, endDate time.Time
+	var err error
+
+	if startDateStr != "" && endDateStr != "" {
+		startDate, err = time.Parse("2006-01-02", startDateStr)
+		if err != nil {
+			http.Error(w, "Invalid startDate format. Use YYYY-MM-DD.", http.StatusBadRequest)
+			return
+		}
+		endDate, err = time.Parse("2006-01-02", endDateStr)
+		if err != nil {
+			http.Error(w, "Invalid endDate format. Use YYYY-MM-DD.", http.StatusBadRequest)
+			return
+		}
+	} else {
+		// Default to the current calendar month
+		startDate, endDate = getStartAndEndOfMonth(time.Now())
+	}
+
+	txns, err := db.GetCategorySpendingByUserGoogleID(ctx, googleID, startDate, endDate)
+	if err != nil{
+		log.Printf("error getting category spending for google id %s: %v", googleID, err)
+		http.Error(w, "Failed to retrieve spending data", http.StatusInternalServerError)
+		return
 	}
 
     w.Header().Set("Content-Type", "application/json")

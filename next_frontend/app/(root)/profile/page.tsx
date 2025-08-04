@@ -37,6 +37,7 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -115,6 +116,17 @@ export default function ProfilePage() {
     }));
   };
 
+  const { user, isLoaded } = useUser();
+
+  if (!isLoaded) {
+    return null;
+  }
+
+  // The imageUrl property will be the Google profile picture URL if they signed in with Google
+  // or the uploaded image if they've set one.
+  const profileImageUrl = user?.imageUrl;
+  const userName = user?.fullName || "User";
+
   return (
     <div className="pt-20 lg:pt-24 p-6 space-y-6">
       <div className="flex items-center gap-3 mb-6">
@@ -148,18 +160,12 @@ export default function ProfilePage() {
                 <div className="flex justify-center mb-4">
                   <div className="relative">
                     <Avatar className="w-24 h-24">
-                      <AvatarImage src="/placeholder-avatar.jpg" />
+                      <AvatarImage src={profileImageUrl} />
                       <AvatarFallback className="text-2xl bg-gradient-to-r from-primary to-purple-600 text-white">
                         {profile.firstName[0]}
                         {profile.lastName[0]}
                       </AvatarFallback>
                     </Avatar>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full p-0">
-                      <Camera className="w-4 h-4" />
-                    </Button>
                   </div>
                 </div>
                 <CardTitle>

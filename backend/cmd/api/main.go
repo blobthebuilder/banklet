@@ -68,6 +68,7 @@ func main() {
 
 		protected.Get("/api/transactions", plaid.SyncTransactions)
 		protected.Get("/api/transactions/list", plaid.GetTransactions)
+		protected.Get("/api/transactions/category", plaid.GetCategorySpending)
 
 		protected.Get("/api/balance", plaid.GetBalancesHandler)
 
